@@ -72,7 +72,6 @@ namespace sjtu {
         }
         return 1;
     }
-
     /*
      * User refund ticket.
      */
@@ -110,6 +109,7 @@ namespace sjtu {
         if(!success) return 0;
         return 1;
     }
+
 
 
     int User::modify(const char* Na,const char* pass,const char* em,const char* pho){

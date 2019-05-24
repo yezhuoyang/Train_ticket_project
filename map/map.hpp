@@ -8,8 +8,6 @@
 #include "exceptions.hpp"
 #include "vector.hpp"
 
-
-
 namespace sjtu {
 	__inline int max(int x,int y){return x>y?x:y;}
 	template<
@@ -163,7 +161,6 @@ namespace sjtu {
 			}
 			map* pointer(){return M;}
 		};
-
 		void deletenode(node *& p){
 			if(p==nullptr) return;
 			deletenode(p->left);

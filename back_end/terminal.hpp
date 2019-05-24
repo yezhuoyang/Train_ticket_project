@@ -12,13 +12,130 @@
 #include "../map/vector.hpp"
 
 
-
 namespace sjtu{
+        template<class key,class value>
+        struct node{
+            key K;
+            value V;
+            node()=default;
+            node(const key& k,const value& v):K(k),V(v){}
+        };
     class terminal{
         map<int,User> User_Bpp;
         map<Trainkey,Train,compare_train> Train_Bpp;
         map<Ticketkey,Ticket,compare_ticket1> Ticket_Bpp1;
         map<Ticketkey,Ticket,compare_ticket2> Ticket_Bpp2;
+        void init_info(){
+            FILE* F=fopen("infofile.txt","rb");
+            if(F==NULL){
+                current_id=2018;
+                return;
+            }
+            fread(&current_id,sizeof(int),1,F);
+        }
+        void write_info(){
+            FILE* F=fopen("infofile.txt","wb");
+            fwrite(&current_id,sizeof(int),1,F);
+        }
+        void User_Bpp_init(){
+            FILE* F=fopen("userfile.txt","rb");
+            if(F==NULL) return;
+            node<int,User> tmp;
+            size_t result=1;
+            while(true){
+                result=fread(&tmp,sizeof(node<int,User>),1,F);
+                if(result){
+                    User_Bpp[tmp.K]=tmp.V;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        void User_Bpp_write(){
+            FILE* F=fopen("userfile.txt","wb");
+            node<int,User> tmp;
+            for(map<int,User>::iterator it=User_Bpp.begin();it!=User_Bpp.end();++it){
+                 tmp.K=it->first;
+                 tmp.V=it->second;
+                 fwrite(&tmp, sizeof(node<int,User>),1,F);
+            }
+        }
+        void Train_Bpp_init(){
+            FILE* F=fopen("trainfile.txt","rb");
+            if(F==NULL) return;
+            node<Trainkey,Train> tmp;
+            size_t result=1;
+            while(true){
+                result=fread(&tmp,sizeof(node<Trainkey,Train>),1,F);
+                if(result){
+                    Train_Bpp[tmp.K]=tmp.V;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        void Train_Bpp_write(){
+            FILE* F=fopen("trainfile.txt","wb");
+            node<Trainkey,Train> tmp;
+            for(map<Trainkey,Train,compare_train>::iterator it=Train_Bpp.begin();it!=Train_Bpp.end();++it){
+                tmp.K=it->first;
+                tmp.V=it->second;
+                fwrite(&tmp,sizeof(node<Trainkey,Train>),1,F);
+            }
+        }
+        void Ticket_Bpp1_init(){
+            FILE* F=fopen("ticketfile1.txt","rb");
+            if(F==NULL) return;
+            node<Ticketkey,Ticket> tmp;
+            size_t result=1;
+            while(true){
+                result=fread(&tmp,sizeof(node<Ticketkey,Ticket>),1,F);
+                if(result){
+                    Ticket_Bpp1[tmp.K]=tmp.V;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        void Ticket_Bpp1_write(){
+            FILE* F=fopen("ticketfile1.txt","wb");
+            node<Ticketkey,Ticket> tmp;
+            for(map<Ticketkey,Ticket,compare_ticket1>::iterator it=Ticket_Bpp1.begin();it!=Ticket_Bpp1.end();++it){
+                tmp.K=it->first;
+                tmp.V=it->second;
+                fwrite(&tmp,sizeof(node<Ticketkey,Ticket>),1,F);
+            }
+        }
+
+        void Ticket_Bpp2_init(){
+            FILE* F=fopen("ticketfile2.txt","rb");
+            if(F==NULL) return;
+            node<Ticketkey,Ticket> tmp;
+            size_t result=1;
+            while(true){
+                result=fread(&tmp,sizeof(node<Ticketkey,Ticket>),1,F);
+                if(result){
+                    Ticket_Bpp2[tmp.K]=tmp.V;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+
+        void Ticket_Bpp2_write(){
+            FILE* F=fopen("ticketfile2.txt","wb");
+            node<Ticketkey,Ticket> tmp;
+            for(map<Ticketkey,Ticket,compare_ticket2>::iterator it=Ticket_Bpp2.begin();it!=Ticket_Bpp2.end();++it){
+                tmp.K=it->first;
+                tmp.V=it->second;
+                fwrite(&tmp,sizeof(node<Ticketkey,Ticket>),1,F);
+            }
+        }
+
         int current_id;
         char input[20];
         int  id;
@@ -66,6 +183,7 @@ namespace sjtu{
           };
           type currenttype;
 
+
          int Register(const char *name, const char *pass, const char *email, const char *phone);
 
          int log_in(const int& id,const char* password);
@@ -97,45 +215,34 @@ namespace sjtu{
          int modify_train(const char*train_id,const char* name,const char* catalog,const int&nums,const int& nump);
 
     public:
-
           terminal(){
-              current_id=2018;
               MinC[0]=0;
               MaxC[0]=255;
               MaxC[1]=0;
-
+              init_info();
+              User_Bpp_init();
+              Train_Bpp_init();
+              Ticket_Bpp1_init();
+              Ticket_Bpp2_init();
           }
           ~terminal(){
-          /*
-              map<int,User> User_Bpp;
-              map<Trainkey,Train,compare_train> Train_Bpp;
-              map<Ticketkey,Ticket,compare_ticket1> Ticket_Bpp1;
-              map<Ticketkey,Ticket,compare_ticket2> Ticket_Bpp2;
-
-
-              FILE* Userfile=fopen("userfile.txt","wb");
-              FILE* Trainfile=fopen("trainfile.txt","wb");
-              FILE* ticketfile1=fopen("ticketfile1.txt","wb");
-              FILE* ticketfile2=fopen("ticketfile2.txt","wb");
-
-              fwrite(&User_Bpp, sizeof(char),sizeof(User_Bpp),Userfile);
-              fwrite(&Train_Bpp, sizeof(char),sizeof(Train_Bpp),Trainfile);
-              fwrite(&Ticket_Bpp1, sizeof(char),sizeof(Ticket_Bpp1),ticketfile1);
-              fwrite(&Ticket_Bpp2, sizeof(char),sizeof(Ticket_Bpp2),ticketfile2);
-
-              fclose();fclose();fclose();fclose();
-            */
+              write_info();
+              User_Bpp_write();
+              Train_Bpp_write();
+              Ticket_Bpp1_write();
+              Ticket_Bpp2_write();
           }
-
-
-
-
           void clear(){
               current_id=2018;
               User_Bpp.clear();
               Train_Bpp.clear();
               Ticket_Bpp1.clear();
               Ticket_Bpp2.clear();
+              write_info();
+              User_Bpp_write();
+              Train_Bpp_write();
+              Ticket_Bpp1_write();
+              Ticket_Bpp2_write();
           }
           int execute(){
               strcpy(input,"\0");
@@ -523,7 +630,6 @@ namespace sjtu{
     }
 
 
-
     int terminal::modify_profile(const int &id, const char *name, const char *password, const char *email, const char *phone){
         int result;
         User U;
@@ -534,8 +640,6 @@ namespace sjtu{
         User_Bpp[id]=U;
         return 1;
     }
-
-
 
 
     int terminal::modify_privilege(const int &id1, const int &id2, const int &privilege) {

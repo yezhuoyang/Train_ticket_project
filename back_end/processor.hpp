@@ -13,9 +13,6 @@ namespace sjtu{
     char MaxC[10];
     char  MinC[2];
     int current_id=2019;
-
-
-
     int Register(const char *name, const char *pass, const char *email, const char *phone){
         User U;
         U.modify(name, pass, email, phone);
@@ -23,8 +20,6 @@ namespace sjtu{
         User_Bpp[current_id]=U;
         return current_id++;
     }
-
-
 /*TODO
  * Put the Train T on sale
  *
@@ -133,24 +128,18 @@ namespace sjtu{
             }
             ++vit1;++kit1;
         }
-
-
         std::cout<<mintime<<std::endl;
-
         std::cout<<startkey.train_id<<" "<<startkey.loc1<<" "<<D<<" "<<start.start_time<<" "<<startkey.loc2<<" "<<D<<" "<<start.arrive_time<<" ";
         for(int j=0;j<start.price_num;++j){
             std::cout<<start.price_name[j]<<" "<<start.remain[j][D.pos]<<" "<<start.price_list[j]<<" ";
         }
         std::cout<<std::endl;
-
-
         std::cout<<arrivekey.train_id<<" "<<arrivekey.loc1<<" "<<D<<" "<<arrive.start_time<<" "<<arrivekey.loc2<<" "<<D<<" "<<arrive.arrive_time<<" ";
         for(int j=0;j<arrive.price_num;++j){
             std::cout<<arrive.price_name[j]<<" "<<arrive.remain[j][D.pos]<<" "<<arrive.price_list[j]<<" ";
         }
         std::cout<<std::endl;
     }
-
 
 
     int query_profile(const int &id) {
@@ -162,8 +151,6 @@ namespace sjtu{
         std::cout << U.name << " " << U.email<<" "<<U.phone<< " " << U.privilege << std::endl;
         return 1;
     }
-
-
 
 /*
  *   Query the ticket that User id has bought
