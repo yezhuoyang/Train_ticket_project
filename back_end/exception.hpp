@@ -7,8 +7,6 @@
 #include <cstddef>
 #include <cstring>
 #include <string>
-
-
 class exception {
 protected:
     const std::string variant = "";
@@ -22,15 +20,17 @@ public:
 };
 
 
-
-
-class index_out_of_bound : public exception {
+class wrong_operation : public exception {
     /* __________________________ */
 };
+
+
 
 class runtime_error : public exception {
     /* __________________________ */
 };
+
+
 
 class invalid_iterator : public exception {
     /* __________________________ */
