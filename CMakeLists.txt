@@ -13,5 +13,5 @@ include_directories()
 
 
 add_executable(debug
-        ../front_end/debug.cpp
+        front_end/debug.cpp
 )
