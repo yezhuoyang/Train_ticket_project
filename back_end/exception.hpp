@@ -40,7 +40,8 @@ class container_is_empty : public exception {
     /* __________________________ */
 };
 
-
+class not_found : public exception {
+};
 
 
 
