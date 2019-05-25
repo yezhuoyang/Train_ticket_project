@@ -8,7 +8,7 @@
 #include <functional>
 #include <cstring>
 #include <cmath>
-#include "exception.h"
+#include "exception.hpp"
 constexpr off_t invalid_off = 0xdeadbeef;
 //
 template <class key_t, class value_t, size_t node_size = 4096, size_t poolsize = 23, class Compare = std::less<key_t>>
