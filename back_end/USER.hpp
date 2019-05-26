@@ -37,10 +37,10 @@ namespace sjtu {
         }
     };
 
+
     bool  operator==(const User&U1,const User&U2){
         return (strcmp(U1.name,U2.name)==0)&&(strcmp(U1.password,U2.password)==0)&&(strcmp(U1.phone,U2.phone)==0)&&(strcmp(U1.email,U2.email)==0);
     }
-
 
 
 

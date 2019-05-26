@@ -276,8 +276,6 @@ namespace sjtu {
         return os;
     }
 
-
-
     /*
      * The function print the information of a single station.
      */

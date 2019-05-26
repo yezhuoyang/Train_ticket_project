@@ -23,8 +23,7 @@ using namespace sjtu;
 
 
 int main() {
-
-     terminal T;
+     terminal T("Userfile.txt");
      int C=1;
      while(C){
           C=T.execute();

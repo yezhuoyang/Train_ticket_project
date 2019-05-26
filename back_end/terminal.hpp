@@ -9,10 +9,11 @@
 //#include "processor.hpp"
 #include "TIME.hpp"
 #include "bplus.hpp"
+#include "string.h"
+#include <stdio.h>
 namespace sjtu{
     class terminal{
-        bptree<int,User> User_Bpp;
-        bptree<Trainkey,Train>  Order_Bpp;
+        bptree<int,User>  User_Bpp;
         int current_id;
         char input[20];
         int  id;
@@ -33,6 +34,7 @@ namespace sjtu{
         int nums,nump;
         char MaxC[10];
         char  MinC[2];
+        char* Userfile;
          /*
           * Enumerate type for different operation
           * Reg:      register          *name* *password* *email* *phone*
@@ -88,16 +90,15 @@ namespace sjtu{
          int delete_train(const char *tid);
 
          int modify_train(const char*train_id,const char* name,const char* catalog,const int&nums,const int& nump);
-
     public:
-          terminal(){
+          terminal(const char* userfile):User_Bpp(userfile){
               MinC[0]=0;
               MaxC[0]=255;
               MaxC[1]=0;
-              //Bpp树的初始化，注意如果以及有用户文件需要读入
-              User_Bpp.init();
+              strcpy(Userfile,userfile);
           }
           ~terminal(){
+
           }
           void clear(){
               current_id=2018;
