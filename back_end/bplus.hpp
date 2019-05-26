@@ -1,5 +1,5 @@
 //
-// Created by zjhz-zyt 
+// Created by zjhz-zyt on 2019/5/18.
 //
 
 #ifndef BTREE_BPTREE_HPP
@@ -11,7 +11,7 @@
 #include "exception.hpp"
 constexpr off_t invalid_off = 0xdeadbeef;
 //
-template <class key_t, class value_t, size_t node_size = 4096, size_t poolsize = 1613, class Compare = std::less<key_t>>
+template <class key_t, class value_t, size_t node_size = 4096, size_t poolsize = 23, class Compare = std::less<key_t>>
 class bptree{
     const char tree_t = '0';
     const char block_t = '1';
@@ -90,6 +90,12 @@ private:
             bufferpool[i%poolsize].state = no_changed;
         }
     }
+    size_t fetch_sz(char *tbuffer){
+        if(*fetcht(tbuffer) == tree_t)
+            return load_tnode(tbuffer)->sz;
+        else
+            return load_block(tbuffer)->sz;
+    }
     off_t fetch_pos(char *tbuffer){
         if(*fetcht(tbuffer) == tree_t)
             return load_tnode(tbuffer)->pos;
@@ -133,6 +139,13 @@ private:
             return p;
         }
     }
+    void delete_node(off_t pos){
+        fseek(file, pos, SEEK_SET);
+        fwrite(&blank_begin, sizeof(off_t), 1, file);
+        fflush(file);
+        blank_begin = pos;
+    }
+
     //申请空节点，未写入外存
     inline block new_block(off_t sz = 0, off_t pos = invalid_off, off_t next = invalid_off){
         pos = new_node();
@@ -188,8 +201,10 @@ private:
         return *load_block(buffer);
     }
     //读入buffer,叶内插入，未改变外存
-    void insert_in_leaf(block &c, const key_t &key, const value_t &v){
+    bool insert_in_leaf(block &c, const key_t &key, const value_t &v){
         size_t x = b_binary_search(key, c.sz);
+        if(*fetchk_b(x, buffer) == key)
+            return false;
         for(size_t i = c.sz; i > x; i--){
             *fetchk_b(i, buffer) = *fetchk_b(i-1, buffer);
             *fetchv_b(i, buffer) = *fetchv_b(i-1, buffer);
@@ -198,6 +213,7 @@ private:
         *fetchk_b(x, buffer) = key;
         *fetchv_b(x, buffer) = v;
         bufferpool[c.pos%poolsize].state = changed;
+        return true;
     }
     void insert_in_parent(tnode &P, const key_t &key, const off_t &N2){
         for(size_t i = P.sz; i > fa_link_pos[pfa_link]; i--){
@@ -260,16 +276,239 @@ private:
         }
     }
 
-    void remove_leaf(block &c, const key_t &key){
-        size_t x = b_binary_search(key, c.sz);
-        if(*fetchk_b(x) != key)
-            throw not_found();
-        for(size_t i = x; i < c.sz-1; i++){
-            *fetchk_b(i) = *fetchk_b(i+1);
-            *fetchv_b(i) = *fetchv_b(i+1);
+    void remove_parent_in(tnode &c, const size_t &mid){
+        for(size_t i = mid; i < c.sz-1 ; i++){
+            *fetchk_t(i, buffer) = *fetchk_t(i+1, buffer);
+            *fetchv_t(i+1, buffer) = *fetchv_t(i+2, buffer);
         }
         c.sz--;
         bufferpool[c.pos%poolsize].state = changed;
+    }
+
+    bool remove_leaf_in(block &c, const key_t &key){
+        size_t x = b_binary_search(key, c.sz);
+        if(*fetchk_b(x, buffer) != key)
+            return false;
+        for(size_t i = x; i < c.sz-1; i++){
+            *fetchk_b(i, buffer) = *fetchk_b(i+1, buffer);
+            *fetchv_b(i, buffer) = *fetchv_b(i+1, buffer);
+        }
+        c.sz--;
+        bufferpool[c.pos%poolsize].state = changed;
+        return true;
+    }
+
+    inline void remove_begin_b(block &c, char *tbuffer){
+        for(size_t i = 0; i < c.sz-1; i++){
+            *fetchk_b(i, tbuffer) = *fetchk_b(i+1, tbuffer);
+            *fetchv_b(i, tbuffer) = *fetchv_b(i+1, tbuffer);
+        }
+        c.sz--;
+    }
+    inline void remove_begin_t(tnode &c, char *tbuffer){
+        for(size_t i = 0; i < c.sz-1; i++){
+            *fetchk_t(i, tbuffer) = *fetchk_t(i+1, tbuffer);
+            *fetchv_t(i, tbuffer) = *fetchv_t(i+1, tbuffer);
+        }
+        *fetchv_t(c.sz-1, tbuffer) = *fetchv_t(c.sz, tbuffer);
+        c.sz--;
+    }
+    void remove_help_t1(char *tmp, key_t midkey, size_t mid, bool flag){
+        memcpy(buffer + sizeof(char) + sizeof(tnode) + (sizeof(off_t) + sizeof(key_t))*(load_tnode(buffer)->sz) + sizeof(off_t),
+                &midkey, sizeof(key_t));
+        memcpy(buffer + sizeof(char) + sizeof(tnode) + (sizeof(off_t) + sizeof(key_t))*(load_tnode(buffer)->sz + 1),
+                tmp + sizeof(char) + sizeof(tnode),
+                (sizeof(off_t) + sizeof(key_t))*load_tnode(tmp)->sz + sizeof(off_t));
+        load_tnode(buffer)->sz += (load_tnode(tmp)->sz + 1);
+        bufferpool[(load_tnode(buffer)->pos)%poolsize].state = changed;
+        if(!flag){
+            bufferpool[(load_tnode(tmp)->pos)%poolsize].state = no_used;
+        }
+        delete_node(load_tnode(tmp)->pos);
+        remove_parent(mid);
+    }
+    void remove_help_t2(char *tmp, key_t midkey, size_t mid, bool flag){
+        memcpy(buffer + sizeof(char) + sizeof(tnode) + (sizeof(off_t) + sizeof(key_t))*(load_tnode(buffer)->sz) + sizeof(off_t),
+               &midkey, sizeof(key_t));
+        memcpy(buffer + sizeof(char) + sizeof(tnode) + (sizeof(off_t) + sizeof(key_t))*(load_tnode(buffer)->sz + 1),
+               tmp + sizeof(char) + sizeof(tnode), sizeof(off_t));
+        key_t  new_key = *fetchk_t(0, tmp);
+        load_tnode(buffer)->sz++;
+        remove_begin_t(*load_tnode(tmp), tmp);
+        bufferpool[load_tnode(buffer)->pos % poolsize].state = changed;
+        if(flag){
+            fseek(file, load_tnode(tmp)->pos, SEEK_SET);
+            fwrite(tmp, node_size, 1, file);
+            fflush(file);
+        }else{
+            bufferpool[load_tnode(tmp)->pos % poolsize].state = changed;
+        }
+        read_in(fa_link[pfa_link]);
+        *fetchk_t(mid, buffer) = new_key;
+        bufferpool[fa_link[pfa_link] % poolsize].state = changed;
+    }
+    void remove_help_t3(char *tmp, key_t midkey, size_t mid, bool flag){
+        tnode &P = *load_tnode(tmp);
+        tnode &P2 = *load_tnode(buffer);
+        for(size_t i = P.sz; i > 0; i--){
+            *fetchk_t(i, tmp) = *fetchk_t(i-1, tmp);
+            *fetchv_t(i+1, tmp) = *fetchv_t(i, tmp);
+        }
+        *fetchv_t(1, tmp) = *fetchv_t(0, tmp);
+
+        *fetchk_t(0, tmp) = midkey;
+        *fetchv_t(0, tmp) = *fetchv_t(P2.sz, buffer);
+        P.sz++;
+        P2.sz--;
+        key_t new_key = *fetchk_t(P2.sz, buffer);
+
+        bufferpool[load_tnode(buffer)->pos % poolsize].state = changed;
+        if(flag){
+            fseek(file, load_tnode(tmp)->pos, SEEK_SET);
+            fwrite(tmp, node_size, 1, file);
+            fflush(file);
+        }else{
+            bufferpool[load_tnode(tmp)->pos % poolsize].state = changed;
+        }
+        read_in(fa_link[pfa_link]);
+        *fetchk_t(mid, buffer) = new_key;
+        bufferpool[fa_link[pfa_link] % poolsize].state = changed;
+    }
+    void remove_parent(size_t mid){
+        read_in(fa_link[pfa_link]);
+        tnode &c = *load_tnode(buffer);
+        remove_parent_in(c, mid);
+        size_t nowsize = c.sz;
+        size_t nowpos = c.pos;
+        if(c.pos == root){
+            if(c.sz == 1){
+                delete_node(c.pos);
+                root = *fetchv_t(0, buffer);
+            }
+            return;
+        }
+        if(nowsize < tnode_min){
+            pfa_link--;
+            read_in(fa_link[pfa_link]);
+            if(fa_link_pos[pfa_link] < fetch_sz(buffer) ){
+                size_t rmid = fa_link_pos[pfa_link];
+                key_t rmidkey = *fetchk_t(rmid, buffer);
+                off_t rbrother = *fetchv_t(fa_link_pos[pfa_link]+1, buffer);
+                read_in(rbrother);
+                if(load_tnode(buffer)->sz + nowsize + 1 <= tnode_max){
+                    read_in(nowpos);
+                    if(fetch_pos(bufferpool[rbrother%poolsize].buffer) != rbrother){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, rbrother, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_t1(tmp, rmidkey, rmid, true);
+                    }else{
+                        remove_help_t1(bufferpool[rbrother%poolsize].buffer, rmidkey, rmid, false);
+                    }
+                }else{
+                    read_in(nowpos);
+                    if(fetch_pos(bufferpool[rbrother%poolsize].buffer) != rbrother){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, rbrother, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_t2(tmp, rmidkey, rmid, true);
+                    }else{
+                        remove_help_t2(bufferpool[rbrother%poolsize].buffer, rmidkey, rmid, false);
+                    }
+                }
+            }else{
+                size_t lmid = fa_link_pos[pfa_link] - 1;
+                key_t lmidkey = *fetchk_t(lmid, buffer);
+                off_t lbrother = *fetchv_t(fa_link_pos[pfa_link]-1, buffer);
+                read_in(lbrother);
+                if(load_tnode(buffer)->sz + nowsize + 1 <= tnode_max){
+                    if(fetch_pos(bufferpool[nowpos%poolsize].buffer) != nowpos){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, nowpos, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_t1(tmp, lmidkey, lmid, true);
+                    }else{
+                        remove_help_t1(bufferpool[nowpos%poolsize].buffer, lmidkey, lmid, false);
+                    }
+                }else{
+                    if(fetch_pos(bufferpool[nowpos%poolsize].buffer) != nowpos){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, nowpos, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_t3(tmp, lmidkey, lmid, true);
+                    }else{
+                        remove_help_t3(bufferpool[nowpos%poolsize].buffer, lmidkey, lmid, false);
+                    }
+                }
+
+            }
+        }
+
+
+    }
+    //tmp不需要
+    void remove_help_b1(char *tmp, key_t midkey, size_t mid, bool flag){
+        memcpy(buffer + sizeof(char) + sizeof(block) + (sizeof(value_t) + sizeof(key_t))*load_block(buffer)->sz,
+                tmp + sizeof(char) + sizeof(block),(sizeof(value_t) + sizeof(key_t)) * load_block(tmp)->sz);
+        if(load_block(tmp)->pos == tail)
+            tail = load_block(buffer)->pos;
+        load_block(buffer)->next = load_block(tmp)->next;
+        load_block(buffer)->sz += load_block(tmp)->sz;
+        bufferpool[(load_block(buffer)->pos) % poolsize].state = changed;
+        if(!flag){
+            bufferpool[(load_block(tmp)->pos) % poolsize].state = no_used;
+        }
+        delete_node(load_block(tmp)->pos);
+        remove_parent(mid);
+    }
+    void remove_help_b2(char *tmp, key_t midkey, size_t mid, bool flag){
+        memcpy(buffer + sizeof(char) + sizeof(block) + (sizeof(value_t) + sizeof(key_t))*load_block(buffer)->sz,
+               tmp + sizeof(char) + sizeof(block),sizeof(value_t) + sizeof(key_t));
+        load_block(buffer)->sz++;
+        remove_begin_b(*load_block(tmp), tmp);
+
+        if(flag){
+            fseek(file, load_block(tmp)->pos, SEEK_SET);
+            fwrite(tmp, node_size, 1, file);
+            fflush(file);
+        }else{
+            bufferpool[(load_block(tmp)->pos) % poolsize].state = changed;
+        }
+        bufferpool[(load_block(buffer)->pos) % poolsize].state = changed;
+
+        read_in(fa_link[pfa_link]);
+        *fetchk_t(mid, buffer) = *fetchk_b(0, tmp);
+        bufferpool[fa_link[pfa_link]%poolsize].state = changed;
+    }
+    void remove_help_b3(char *tmp, key_t midkey, size_t mid, bool flag){
+        block &c = *load_block(tmp);
+        block &c2 = *load_block(buffer);
+        for(size_t i = c.sz; i > 0; i--){
+            *fetchk_b(i, tmp) = *fetchk_b(i-1, tmp);
+            *fetchv_b(i, tmp) = *fetchv_b(i-1, tmp);
+        }
+        *fetchk_b(0, tmp) = *fetchk_b(c2.sz-1, buffer);
+        *fetchv_b(0, tmp) = *fetchv_b(c2.sz-1, buffer);
+        c.sz++;
+        c2.sz--;
+        key_t new_key = *fetchk_b(0, tmp);
+
+        if(flag){
+            fseek(file, load_block(tmp)->pos, SEEK_SET);
+            fwrite(tmp, node_size, 1, file);
+            fflush(file);
+        }else{
+            bufferpool[(load_block(tmp)->pos) % poolsize].state = changed;
+        }
+        bufferpool[(load_block(buffer)->pos) % poolsize].state = changed;
+
+        read_in(fa_link[pfa_link]);
+        *fetchk_t(mid, buffer) = new_key;
+        bufferpool[fa_link[pfa_link]%poolsize].state = changed;
     }
 public:
     bptree(const char * fname)
@@ -299,7 +538,7 @@ public:
         fseek(file, 0, SEEK_SET);//??????????
     }
     //函数开始保护，结尾无保护
-    void insert(const key_t &key, const value_t &v){
+    bool insert(const key_t &key, const value_t &v){
         if(alsize == 0){
             block p = new_block(1);
 
@@ -314,14 +553,16 @@ public:
 
             alsize++;
             head = tail = root = p.pos;
-            return;
+            return true;
         }else{//保证过程运行期间不能改动buffer
             block &L = find_block(key);
             if(L.sz < block_max){
-                insert_in_leaf(L, key, v);
+                if(!insert_in_leaf(L, key, v))
+                    return false;
                 alsize++;
             }else{
-                insert_in_leaf(L, key, v);
+                if(!insert_in_leaf(L, key, v))
+                    return false;
                 block L2 = new_block(L.sz/2);
                 L.sz -= L2.sz;
                 L2.next = L.next;
@@ -348,6 +589,7 @@ public:
                 }
 
                 insert_parent(L.pos, *fetchk_b(L.sz, buffer), L2.pos);
+                return true;
             }
         }
     }
@@ -364,19 +606,17 @@ public:
         }
     }
     //函数开始有保护，结束无保护，fwrite结束
-    void modify(const key_t &key, const value_t &v){
+    bool modify(const key_t &key, const value_t &v){
         if(root == invalid_off)
-            throw not_found();
+            return false;
         block &c = find_block(key);
         size_t x = b_binary_search(key, c.sz);
         if(*fetchk_b(x, buffer) != key){
-           throw not_found();
+            return false;
         }else{
-            /**fetchv_b(x, buffer) = v;
-            fseek(file, c.pos + (sizeof(key_t) + sizeof(value_t))*x + sizeof(char) + sizeof(block),SEEK_SET);
-            fwrite(&v, sizeof(value_t), 1, file);*/
             *fetchv_b(x, buffer) = v;
             bufferpool[c.pos%poolsize].state = changed;
+            return true;
         }
     }
     void init(){
@@ -389,20 +629,82 @@ public:
         }
     }
 
-    /*void remove(const key_t &key){
+    bool remove(const key_t &key){
         if(root == invalid_off)
-            throw not_found();
+            return false;
         block &c = find_block(key);
-        remove_leaf(c, key);
-        if(c.pos == root && c.sz == 0){
-            init();
+        if(!remove_leaf_in(c, key))
+            return false;
+        alsize--;
+
+        size_t nowsize = c.sz;
+        off_t  nowpos = c.pos;
+        if(c.pos == root){
+            if(c.sz == 0)
+                init();
+            return true;
         }
-        if(c.sz < block_min){
+        if(nowsize < block_min){
             pfa_link--;
             read_in(fa_link[pfa_link]);
-            if()
+            if(fa_link_pos[pfa_link] < fetch_sz(buffer)){
+                size_t rmid = fa_link_pos[pfa_link];
+                key_t rmidkey = *fetchk_t(rmid, buffer);
+                off_t rbrother = *fetchv_t(fa_link_pos[pfa_link]+1, buffer);
+                read_in(rbrother);
+                if(load_block(buffer)->sz + nowsize <= block_max){
+                    read_in(nowpos);
+                    if(fetch_pos(bufferpool[rbrother%poolsize].buffer) != rbrother){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, rbrother, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_b1(tmp, rmidkey, rmid, true);
+                    }else{
+                        remove_help_b1(bufferpool[rbrother%poolsize].buffer, rmidkey, rmid, false);
+                    }
+                }else{
+                    read_in(nowpos);
+                    if(fetch_pos(bufferpool[rbrother%poolsize].buffer) != rbrother){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, rbrother, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_b2(tmp, rmidkey, rmid, true);
+                    }else{
+                        remove_help_b2(bufferpool[rbrother%poolsize].buffer, rmidkey, rmid, false);
+                    }
+                }
+            }else{
+                size_t lmid = fa_link_pos[pfa_link] - 1;
+                key_t lmidkey = *fetchk_t(lmid, buffer);
+                off_t lbrother = *fetchv_t(fa_link_pos[pfa_link]-1, buffer);
+                read_in(lbrother);
+                if(load_block(buffer)->sz + nowsize <= block_max){
+                    if(fetch_pos(bufferpool[nowpos%poolsize].buffer) != nowpos){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, nowpos, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_b1(tmp, lmidkey, lmid, true);
+                    }else{
+                        remove_help_b1(bufferpool[nowpos%poolsize].buffer, lmidkey, lmid, false);
+                    }
+                }else{
+                    if(fetch_pos(bufferpool[nowpos%poolsize].buffer) != nowpos){
+                        char tmp[node_size + sizeof(key_t) + sizeof(value_t)];
+                        fseek(file, nowpos, SEEK_SET);
+                        fread(tmp, 1, node_size, file);
+                        fflush(file);
+                        remove_help_b3(tmp, lmidkey, lmid, true);
+                    }else{
+                        remove_help_b3(bufferpool[nowpos%poolsize].buffer, lmidkey, lmid, false);
+                    }
+                }
+            }
         }
-    }*/
+        return true;
+    }
 
     void traverse(){
         off_t p = head;
@@ -419,15 +721,3 @@ public:
     }
 };
 #endif //BTREE_BPTREE_HPP
-
-
-
-
-
-
-
-
-
-
-
-#endif //UNTITLED_BPLUS_HPP
