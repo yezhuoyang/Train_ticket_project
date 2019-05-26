@@ -8,7 +8,6 @@
 #include "stdio.h"
 
 
-
 namespace  sjtu {
     /*
      * The function convert hour ab and minute cd to string "ab:cd"
@@ -45,15 +44,6 @@ namespace  sjtu {
             pos=rhs.pos;
             return *this;
         }
-        bool operator>(const Date &rhs){
-            return strcmp(date,rhs.date)>0;
-        }
-        bool operator<(const Date &rhs){
-            return strcmp(date,rhs.date)<0;
-        }
-        bool operator==(const Date& rhs) const{
-            return strcmp(date,rhs.date)==0;
-        }
     };
 //时间类
     struct Time {
@@ -76,15 +66,6 @@ namespace  sjtu {
             minute=rhs.minute;
             return *this;
         }
-        bool operator>(const Time &T){
-            return strcmp(time,T.time)>0;
-        }
-        bool operator<(const Time& T){
-            return strcmp(time,T.time)<0;
-        }
-        bool operator==(const Time &T)const{
-            return strcmp(time,T.time)==0;
-        }
         Time& operator=(const Time& rhs){
             if(&rhs==this) return *this;
             strcpy(time,rhs.time);
@@ -95,14 +76,11 @@ namespace  sjtu {
         int operator-(const Time& rhs){
             return (hour-rhs.hour)*60+minute-rhs.minute;
         }
-
-
     };
     std::ostream &operator<<(std::ostream& os,const Date& D){
          os<<D.date;
          return os;
     }
-
     std::istream &operator>>(std::istream& is,Date& D){
         is>>D.date;
         D.pos=date_to_int(D.date);
@@ -118,6 +96,26 @@ namespace  sjtu {
         T.minute=10*(T.time[3]-'0')+(T.time[4]-'0');
         return is;
     }
+    bool operator>(const Date&D1,const Date &D2){
+        return D1.pos>D2.pos;
+    }
+    bool operator<(const Date&D1,const Date &D2){
+        return D1.pos<D2.pos;
+    }
+    bool operator==(const Date&D1,const Date &D2){
+        return D1.pos==D2.pos;
+    }
+    bool operator>(const Time &T1,const Time &T2){
+        return strcmp(T1.time,T2.time)>0;
+    }
+    bool operator<(const Time &T1,const Time &T2){
+        return strcmp(T1.time,T2.time)<0;
+    }
+    bool operator==(const Time &T1,const Time &T2){
+        return strcmp(T1.time,T2.time)==0;
+    }
+
+
 
 
 }
