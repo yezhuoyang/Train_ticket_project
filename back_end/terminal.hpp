@@ -272,7 +272,6 @@ namespace sjtu{
     }
 
 
-
 /*
      add_train A  Atrain  CD 5 1 商务座
      北京 xx:xx 08:00 00:00 ¥0.0
