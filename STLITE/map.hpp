@@ -5,9 +5,8 @@
 #include <cstddef>
 #include <iostream>
 #include "utility.hpp"
-#include "exceptions.hpp"
+#include "exceptions.h"
 #include "vector.hpp"
-
 namespace sjtu {
 	__inline int max(int x,int y){return x>y?x:y;}
 	template<

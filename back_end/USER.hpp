@@ -5,6 +5,7 @@
 #define SJTU_USER_HPP
 #include <iostream>
 #include "TRAIN.hpp"
+#include "constant.h"
 namespace sjtu {
     struct User {
         /*
@@ -14,10 +15,10 @@ namespace sjtu {
          * 2 Administrator
          */
         int privilege;
-        char name[40];
-        char password[20];
-        char phone[20];
-        char email[20];
+        char name[NAMESIZE];
+        char password[PASSSIZE];
+        char phone[PHONESIZE];
+        char email[EMAILSIZE];
         User()=default;
         User(const char* N){strcpy(name,N);}
         User&operator=(const User &U){
@@ -36,15 +37,9 @@ namespace sjtu {
             strcpy(phone,Ph);
         }
     };
-
-
     bool  operator==(const User&U1,const User&U2){
         return (strcmp(U1.name,U2.name)==0)&&(strcmp(U1.password,U2.password)==0)&&(strcmp(U1.phone,U2.phone)==0)&&(strcmp(U1.email,U2.email)==0);
     }
-
-
-
-
     /*
      * User buy num tickets. Return 0 if the tickets are not enough.
      * First search the ticket from all ticket that he has already bought.

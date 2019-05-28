@@ -8,6 +8,7 @@
 #include "stdio.h"
 
 
+
 namespace  sjtu {
     /*
      * The function convert hour ab and minute cd to string "ab:cd"
@@ -58,6 +59,11 @@ namespace  sjtu {
         Time(){
             strcpy(time,"XX:XX");
             hour=minute=0;
+        }
+        Time(const Time&rhs) {
+            strcpy(time, rhs.time);
+            hour = rhs.hour;
+            minute = rhs.minute;
         }
         Time& operator=(Time& rhs){
             if(&rhs==this) return *this;

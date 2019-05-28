@@ -4,29 +4,21 @@
 
 #include <iostream>
 
-#include "../map/map.hpp"
-
-#include "../back_end/TIME.hpp"
-#include "../back_end/TRAIN.hpp"
-#include "../back_end/USER.hpp"
-#include "../map/map.hpp"
-#include "../map/vector.hpp"
 #include "../back_end/terminal.hpp"
 
 
 
+
+
+
 using namespace sjtu;
-using namespace std;
-using namespace sjtu;
 
-
-
-
-int main() {
-     terminal T("Userfile.txt");
-     int C=1;
-     while(C){
-          C=T.execute();
-     }
-
+int main(){
+    terminal T("info.txt","User.txt","train.txt","trainid.txt","order.txt","orderid.txt","ticket.txt","ticketid.txt","station.txt");
+    int c=1;
+    while(c){
+        c=T.execute();
+    }
 }
+
+

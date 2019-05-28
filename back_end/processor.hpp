@@ -6,8 +6,7 @@
 #include "TRAIN.hpp"
 #include "TIME.hpp"
 #include "vector.hpp"
-
-
+#include "link.hpp"
 namespace sjtu{
     char MaxC[10];
     char  MinC[2];
