@@ -5,9 +5,7 @@
 
 #ifndef UNTITLED_CONSTANT_H
 #define UNTITLED_CONSTANT_H
-
-
-
+#include <string.h>
 //第一个注册用户id
 #define FIRSTID 2019
 //loc大小

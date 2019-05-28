@@ -7,7 +7,7 @@
 #include "../STLITE/vector.hpp"
 #include "../STLITE/deque.hpp"
 #include<vector>
-
+#include "constant.h"
 namespace sjtu{
     //这是一个用来存储外存某一块区域的大小、位置的结构体
     struct block{

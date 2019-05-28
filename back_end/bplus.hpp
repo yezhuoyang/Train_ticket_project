@@ -2,8 +2,10 @@
 #include "alloc.hpp"
 #include "../STLITE/vector.hpp"
 #include "..//STLITE/utility.hpp"
+#include "constant.h"
 #include <iostream>
 #include <functional>
+
 //typedef int off_t;
 template <class key_t, class value_t, size_t node_size = 4096, class Compare = std::less<key_t>>
 class bptree {
@@ -194,8 +196,6 @@ private:
         p.key = *nthk_t(b, 0);
 
     }
-
-
     size_t bsearch_b(buffer_p b, key_t k, size_t n) {
         //printf("block binary search : %d %d\n", k, n);
         size_t l = 0, r = n, mid;

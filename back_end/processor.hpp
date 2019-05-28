@@ -7,6 +7,7 @@
 #include "TIME.hpp"
 #include "vector.hpp"
 #include "link.hpp"
+#include "constant.h"
 namespace sjtu{
     char MaxC[10];
     char  MinC[2];

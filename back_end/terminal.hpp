@@ -1,7 +1,6 @@
 //
 // This is the class that determines the input and output of terminal
 //
-
 #ifndef TRAIN_TICKET_PROJECT_TERMINAL_HPP
 #define TRAIN_TICKET_PROJECT_TERMINAL_HPP
 #include <iostream>

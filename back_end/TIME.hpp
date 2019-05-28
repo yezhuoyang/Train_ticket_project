@@ -6,7 +6,7 @@
 #define SJTU_TIME_HPP
 #include <iostream>
 #include "stdio.h"
-
+#include "constant.h"
 
 
 namespace  sjtu {
