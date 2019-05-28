@@ -527,6 +527,7 @@ namespace sjtu{
 
 
 
+
     int terminal::query_ticket(const char *lc1, const char *lc2, const Date &D, const char *cat){
         Ticketkey K("\0",lc1,lc2,cat);
         vector<pair<Ticketkey,Ticket>> V;
