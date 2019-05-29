@@ -6,11 +6,22 @@
 #include "TIME.hpp"
 #include "link.hpp"
 #include "link.hpp"
-#include <string.h>
-#include<iostream>
-#include<stdio.h>
 #include "constant.h"
 namespace sjtu {
+    double transform_to_double(const char* tmp){
+        int pos=0,dig=-1;
+        while(tmp[pos]>'9'||tmp[pos]<'0') ++pos;
+        double num=0;
+        while(tmp[pos]){
+            if(tmp[pos]=='.')
+                dig=pos;
+            else
+                num=10*num+(tmp[pos]-'0');
+            ++pos;
+        }
+        num=num*pow(10,-(pos-dig-1));
+        return num;
+    }
     struct Station{
         char loc[LOCSIZE];
         Time arrive_time,start_time,stop_time;
@@ -45,7 +56,7 @@ namespace sjtu {
         is>>S.loc>>S.arrive_time>>S.start_time>>S.stop_time;
         for(int i=0;i<S.type_num;++i){
             is>>tmp;
-            S.price[i]=strtod(tmp+2,NULL);
+            S.price[i]=transform_to_double(tmp);
         }
         return is;
     }
@@ -71,7 +82,7 @@ namespace sjtu {
         }
     };
     struct Train {
-            char name[NAMESIZE];
+            char name[TRAINNAME];
             char catalog[CATSIZE];
             int station_num;
             //存放Station在文件中存放的位置

@@ -5,7 +5,6 @@
 #include "constant.h"
 #include <iostream>
 #include <functional>
-
 //typedef int off_t;
 template <class key_t, class value_t, size_t node_size = 4096, class Compare = std::less<key_t>>
 class bptree {
@@ -67,14 +66,11 @@ private:
         fwrite(b, 1, (sizeof(key_t) + sizeof(off_t)) * p.sz, file);
         file_reopen();
     }
-
-
     inline void buf_load_b(char * b, node p) {
         move_to_data(p);
         if (!p.sz) return;
         fread(b, 1, (sizeof(key_t) + sizeof(value_t)) * p.sz, file);
     }
-
     inline void buf_save_b(char * b, node p) {
         move_to_data(p);
         fwrite(b, 1, (sizeof(key_t) + sizeof(value_t)) * p.sz, file);

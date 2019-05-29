@@ -3,15 +3,17 @@
 //
 #ifndef TRAIN_TICKET_PROJECT_TERMINAL_HPP
 #define TRAIN_TICKET_PROJECT_TERMINAL_HPP
-#include <iostream>
 #include "TIME.hpp"
 #include "TRAIN.hpp"
 #include "bplus.hpp"
 #include "string.h"
 #include "constant.h"
-#include <stdio.h>
 #include "USER.hpp"
 namespace sjtu{
+
+    void print(const Trainkey& Tkey,const Train& T){
+         std::cout<<Tkey.train_id<<" "<<T.name<<std::endl;
+    }
     class terminal{
         list<User>  User_list;
         bptree<Trainkey,Train,4096,compare_train> Train_bpp;
@@ -19,7 +21,6 @@ namespace sjtu{
         bptree<Ticketkey,Ticket,4096,compare_ticket> Ticket_bpp;
         link<Station> Station_link;
         FILE* infoF;//用来管理用户信息的文件
-        char infofile[20];
         int current_id;
         char input[20];
         int  id;
@@ -38,7 +39,9 @@ namespace sjtu{
         char catalog[CATSIZE];
         int result;
         int nums,nump;
-        char* Userfile;
+        char  Trainfile[20];char Trainidfile[20];
+        char  Orderfile[20];char Orderidfile[20];
+        char  Ticketfile[20];char Ticketidfile[20];
          /*
           * Enumerate type for different operation
           * Reg:      register          *name* *password* *email* *phone*
@@ -95,22 +98,20 @@ namespace sjtu{
 
          int modify_train(const char*train_id,const char* name,const char* catalog,const int&nums,const int& nump);
     public:
-          terminal(const char* infof,const char* uf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
+          terminal(const char* uf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
                   const char* stationfile):User_list(uf),Train_bpp(Tf,Tfid),Order_bpp(of,ofid),Ticket_bpp(tf,tfid),
                   Station_link(stationfile){
-              strcpy(infofile,infof);
-              infoF=fopen(infof,"rb+");
-              if(infoF==NULL){
-                  infoF=fopen(infof,"wb+");
-                  current_id=FIRSTID;
-              }
-              fseek(infoF,0,SEEK_SET);
-              fread(&current_id,sizeof(int),1,infoF);
+              strcpy(Trainfile,Tf);
+              strcpy(Trainidfile,Tfid);
+              strcpy(Orderfile,of);
+              strcpy(Orderidfile,ofid);
+              strcpy(Ticketfile,tf);
+              strcpy(Ticketidfile,tfid);
+              current_id=User_list.Size()+FIRSTID;
+
           }
           ~terminal(){
-              fseek(infoF,0,SEEK_SET);
-              fwrite(&current_id,sizeof(int),1,infoF);
-              fclose(infoF);
+
           }
           void clear(){
               current_id=FIRSTID;
@@ -195,7 +196,6 @@ namespace sjtu{
               else if(strcmp(input,"sale_train")==0) {
                   currenttype = St;
                   std::cin >> train_id;
-                  std::cout << train_id << std::endl;
                   result = put_on_sale(train_id);
                   std::cout << result << std::endl;
               }
@@ -226,16 +226,22 @@ namespace sjtu{
                   currenttype=Ex;
                   std::cout<<"BYE"<<std::endl;
               }
+              else if(strcmp(input,"traverse")==0){
+                  Train_bpp.traverse(print);
+              }
               if(currenttype==Ex) return 0;
               else return 1;
           }
     };
+
+
     /*
      * TODO 用户已经存在的时候要有特殊返回值
      */
     int terminal::Register(const char *name, const char *pass, const char *email, const char *phone){
         User U;
         U.modify(name, pass, email, phone);
+        U.privilege=1;
         if(current_id==FIRSTID) U.privilege=2;
         //读取失败！
         User_list.push_back(U);
@@ -247,8 +253,12 @@ namespace sjtu{
     int terminal::put_on_sale(const char *tid){
         //std::cout<<"Selling"<<" "<<tid<<std::endl;
         Trainkey K(tid);
+        if(!Train_bpp.count(K)) {
+            return 0;
+        }
         Train T=Train_bpp.find(K);
-        if(T==Train()||T.For_sale) return 0;
+        if(T.For_sale){
+            return 0;}
         T.For_sale=true;
         sjtu::vector<Station> V;
         Station_link.read_block(T.stblock,V);
@@ -267,8 +277,10 @@ namespace sjtu{
                 Ticket_bpp.insert(Ticketkey(tid,V[i].loc,V[j].loc,T.catalog),tmp);
             }
         }
+        Train_bpp.set(K,T);
         return 1;
     }
+
 
 
 /*
@@ -290,14 +302,12 @@ namespace sjtu{
      海南 08:10 xx:xx 00:00 ¥1.5
  */
 
-
 /*
     add_train E  Etrain CD 3 1 商务座
     日本 xx:xx 08:20 00:00 ¥0.0
     南京 08:25 08:30 00:00 ¥1.5
     海南 08:40 xx:xx 00:00 ¥1.5
  */
-
 
 
     int terminal::query_transfer(const char *loc1, const char *loc2, const Date &D, const char *cat){
@@ -344,7 +354,6 @@ namespace sjtu{
         return 1;
     }
 
-
     /*
     *   Query the ticket that User id has bought
     */
@@ -361,7 +370,6 @@ namespace sjtu{
         }
         return 1;
     }
-
 //    buy_ticket 2018 1 abc123456 北京 夏威夷  2018-06-28 商务座
 //    1
 //    query_order 2018 2018-06-28 G
@@ -374,18 +382,15 @@ namespace sjtu{
         vector<pair<Ticketkey,Ticket>> V;
         Ticket_bpp.search(V,K,compare_ticket());
         if(V.empty()) {
-            std::cout<<"没找到!"<<std::endl;
             return 0;
         }
         //确定改票种的位置
         int k=0;
         while(k<V[0].second.price_num&&strcmp(V[0].second.price_name[k],ticket_kind)!=0)++k;
         if(k==V[0].second.price_num) {
-            std::cout<<"无匹配!"<<std::endl;
             return 0;
         }
         if(V[0].second.remain[k][date.pos]<num) {
-            std::cout << "不够了!" << std::endl;
             return 0;
         }
         V[0].second.remain[k][date.pos]-=num;
@@ -399,8 +404,6 @@ namespace sjtu{
         Order_bpp.insert(ok,O);
         return 1;
     }
-
-
 
     int terminal::refund_ticket(const int& id,const int& num,const char* train_id,const char* loc1,const char* loc2,const Date& date,const char* ticket_kind){
         Orderkey okey(id,date,"\0",train_id);
@@ -418,7 +421,6 @@ namespace sjtu{
         Ticket_bpp.set(tkey,T);
         return 1;
     }
-
 
     int terminal::add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
@@ -443,11 +445,11 @@ namespace sjtu{
         return 1;
     }
 
-
     int terminal::modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
+        if(!Train_bpp.count(K)) return 0;
         Train T=Train_bpp.find(K);
-        if(T==Train()||T.For_sale) return 0;
+        if(T.For_sale) return 0;
         strcpy(T.name, name);
         strcpy(T.catalog, catalog);
         T.station_num = nums;
@@ -508,8 +510,8 @@ namespace sjtu{
 
     int terminal::query_train(const char *tid){
         Trainkey K(tid);
+        if(!Train_bpp.count(K)) return 0;
         Train T=Train_bpp.find(K);
-        if(T==Train()) return 0;
         std::cout << tid << " " << T.name << " " << T.catalog << " " << T.station_num << " " << T.price_num << " ";
         for (int i = 0; i < T.price_num; ++i) {
             std::cout << T.price_name[i] << " ";

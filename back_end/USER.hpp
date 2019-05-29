@@ -3,7 +3,6 @@
 //
 #ifndef SJTU_USER_HPP
 #define SJTU_USER_HPP
-#include <iostream>
 #include "TRAIN.hpp"
 #include "constant.h"
 namespace sjtu {
@@ -20,7 +19,7 @@ namespace sjtu {
         char phone[PHONESIZE];
         char email[EMAILSIZE];
         User()=default;
-        User(const char* N){strcpy(name,N);}
+        User(const char* N){strcpy(name,N);privilege=1;}
         User&operator=(const User &U){
             if(&U==this) return *this;
             privilege=U.privilege;

@@ -6,6 +6,10 @@
 #ifndef UNTITLED_CONSTANT_H
 #define UNTITLED_CONSTANT_H
 #include <string.h>
+#include <string.h>
+#include<iostream>
+#include<stdio.h>
+#include<cmath>
 //第一个注册用户id
 #define FIRSTID 2019
 //loc大小
@@ -13,6 +17,9 @@
 //用户name 大小
 #define NAMESIZE 20
 //用户email大小
+//火车名字大小
+#define TRAINNAME 30
+
 #define  EMAILSIZE 20
 //用户电话号码大小
 #define  PHONESIZE 20

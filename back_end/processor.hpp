@@ -19,11 +19,8 @@ namespace sjtu{
         User_Bpp[current_id]=U;
         return current_id++;
     }
-/*TODO
- * Put the Train T on sale
- *
- *
- */
+
+
     int terminal::put_on_sale(const char *tid) {
         Train T;
         Trainkey key(tid);
@@ -54,9 +51,7 @@ namespace sjtu{
     }
 
 
-/*
- * TODO
- */
+
     void query_transfer(const char *loc1, const char *loc2, const Date &D, const char *cat){
 
         sjtu::vector<Ticket> V1;
@@ -141,7 +136,7 @@ namespace sjtu{
     }
 
 
-    int query_profile(const int &id) {
+    int query_profile(const int &id){
         int result;
         User U;
         result=User_Bpp.count(id);
@@ -150,6 +145,7 @@ namespace sjtu{
         std::cout << U.name << " " << U.email<<" "<<U.phone<< " " << U.privilege << std::endl;
         return 1;
     }
+
 
 /*
  *   Query the ticket that User id has bought
@@ -234,7 +230,6 @@ namespace sjtu{
 
 
 
-
     int add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump) {
         int result;
         Train T;
@@ -255,7 +250,6 @@ namespace sjtu{
         Train_Bpp[key]=T;
         return 1;
     }
-
 
 
     int modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump) {
@@ -330,7 +324,6 @@ namespace sjtu{
         User_Bpp[id2]=U2;
         return 1;
     }
-
 
 
 
