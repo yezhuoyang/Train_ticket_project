@@ -134,30 +134,28 @@ namespace sjtu {
     struct Ticketkey{
           char loc1[LOCSIZE];
           char loc2[LOCSIZE];
-          char catalog[CATSIZE];
           char tid[IDSIZE];
-          Ticketkey(const char*id,const char* lc,const char* lc2,const char*cat){
+          Ticketkey(const char*id,const char* lc,const char* lc2){
                strcpy(tid,id);
                strcpy(loc1,lc);
                strcpy(loc2,lc2);
-               strcpy(catalog,cat);
           }
           Ticketkey& operator=(const Ticketkey& rhs){
               if(&rhs==this) return *this;
               strcpy(loc1,rhs.loc1);
               strcpy(loc2,rhs.loc2);
-              strcpy(catalog,rhs.catalog);
               strcpy(tid,rhs.tid);
               return *this;
           }
           Ticketkey(const Ticketkey& rhs){
               strcpy(loc1,rhs.loc1);
               strcpy(loc2,rhs.loc2);
-              strcpy(catalog,rhs.catalog);
               strcpy(tid,rhs.tid);
           }
           Ticketkey()= default;
     };
+
+
     class compare_ticket{
     public:
         bool operator () (const Ticketkey& T1,const Ticketkey& T2) const {
@@ -169,16 +167,30 @@ namespace sjtu {
                    if(strcmp(T1.loc2,T2.loc2)<0) return true;
                    if(strcmp(T1.loc2,T2.loc2)>0) return false;
                }
-               if(strcmp(T1.catalog,"\0")!=0&&strcmp(T2.catalog,"\0")!=0){
-                   if(strcmp(T1.catalog,T2.catalog)<0) return true;
-                   if(strcmp(T1.catalog,T2.catalog)>0) return false;
-               }
                if(strcmp(T1.tid,"\0")!=0&&strcmp(T2.tid,"\0")!=0){
                    if(strcmp(T1.tid,T2.tid)<0) return true;
                }
                return false;
         }
     };
+
+
+
+    class search_ticket{
+    public:
+        bool operator () (const Ticketkey& T1,const Ticketkey& T2) const {
+                if(strcmp(T1.loc1,"\0")!=0&&strcmp(T2.loc1,"\0")!=0){
+                    if(strcmp(T1.loc1,T2.loc1)<0) return true;
+                    if(strcmp(T1.loc1,T2.loc1)>0) return false;
+                }
+                if(strcmp(T1.loc2,"\0")!=0&&strcmp(T2.loc2,"\0")!=0){
+                    if(strcmp(T1.loc2,T2.loc2)<0) return true;
+                }
+            return false;
+        }
+    };
+
+
 
     struct Ticket{
             /*
@@ -192,7 +204,10 @@ namespace sjtu {
             Time arrive_time,start_time;
             int price_num;
             char price_name[PRICENUM][PRICESIZE];
+            char loc1[LOCSIZE];
+            char loc2[LOCSIZE];
             double price[PRICENUM];
+            char catalog[CATSIZE];
             bool operator==(const Ticket& rhs){
                 return price_num==rhs.price_num;
             }
@@ -207,6 +222,9 @@ namespace sjtu {
                 arrive_time=rhs.arrive_time;
                 start_time=rhs.start_time;
                 price_num=rhs.price_num;
+                strcpy(catalog,rhs.catalog);
+                strcpy(loc1,rhs.loc1);
+                strcpy(loc2,rhs.loc2);
                 for(int i=0;i<price_num;++i){
                     strcpy(price_name[i],rhs.price_name[i]);
                     price[i]=rhs.price[i];
@@ -220,6 +238,9 @@ namespace sjtu {
                 arrive_time=rhs.arrive_time;
                 start_time=rhs.start_time;
                 price_num=rhs.price_num;
+                strcpy(catalog,rhs.catalog);
+                strcpy(loc1,rhs.loc1);
+                strcpy(loc2,rhs.loc2);
                 for(int i=0;i<price_num;++i){
                     strcpy(price_name[i],rhs.price_name[i]);
                     price[i]=rhs.price[i];
@@ -233,14 +254,10 @@ namespace sjtu {
              */
             void copy(const Train& T){
                     price_num=T.price_num;
+                    strcpy(catalog,T.catalog);
                     for(int i=0;i<price_num;++i){
                         strcpy(price_name[i],T.price_name[i]);
                     }
-            }
-            void copy_price(const Station& S){
-                for(int i=0;i<price_num;++i){
-                    price[i]=S.price[i];
-                }
             }
     };
     /*
@@ -249,11 +266,9 @@ namespace sjtu {
     struct Orderkey{
             int Uid;
             Date D;
-            char catalog[CATSIZE];
             char train_id[IDSIZE];
-            Orderkey(const int&id,const Date& d,const char* cat,const char*tid){
+            Orderkey(const int&id,const Date& d,const char*tid){
                 Uid=id;D=d;
-                strcpy(catalog,cat);
                 strcpy(train_id,tid);
             }
             Orderkey()= default;
@@ -261,17 +276,35 @@ namespace sjtu {
                 if(&rhs==this) return *this;
                 Uid=rhs.Uid;
                 D=rhs.D;
-                strcpy(catalog,rhs.catalog);
                 strcpy(train_id,rhs.train_id);
                 return *this;
             }
             Orderkey(const Orderkey& rhs){
                 Uid=rhs.Uid;
                 D=rhs.D;
-                strcpy(catalog,rhs.catalog);
                 strcpy(train_id,rhs.train_id);
             }
     };
+
+
+    class search_order{
+    public:
+        bool operator () (const Orderkey& T1,const Orderkey& T2) const {
+            {
+                if(T1.Uid<T2.Uid) return true;
+                if(T1.Uid>T2.Uid) return false;
+                if(T1.D<T2.D) return true;
+                return false;
+            }
+        }
+    };
+
+
+
+
+
+
+
     class compare_order{
     public:
         bool operator () (const Orderkey& T1,const Orderkey& T2) const {
@@ -280,10 +313,6 @@ namespace sjtu {
                 if(T1.Uid>T2.Uid) return false;
                 if(T1.D<T2.D) return true;
                 if(T1.D>T2.D) return false;
-                if(strcmp(T1.catalog,"\0")!=0&&strcmp(T2.catalog,"\0")!=0){
-                    if(strcmp(T1.catalog,T2.catalog)<0) return true;
-                    if(strcmp(T1.catalog,T2.catalog)>0) return false;
-                }
                 if(strcmp(T1.train_id,"\0")!=0&&strcmp(T2.train_id,"\0")!=0){
                     if(strcmp(T1.train_id,T2.train_id)<0) return true;
                 }
@@ -297,6 +326,7 @@ namespace sjtu {
         int  remain[PRICENUM];
         // Total number of such tickets. If sum==0, the ticket is deleted.
         int  sum;
+
         /*
          * The remaining value of tickets from date june 1st to june thirtieth.
          */
@@ -304,6 +334,7 @@ namespace sjtu {
         int price_num;
         char price_name[PRICENUM][PRICESIZE];
         double price[PRICENUM];
+        char catalog[CATSIZE];
         /*
          * The list of price value.
          */
@@ -315,6 +346,7 @@ namespace sjtu {
         Order(const Order& rhs){
             strcpy(loc1,rhs.loc1);
             strcpy(loc2,rhs.loc2);
+            strcpy(catalog,rhs.catalog);
             sum=rhs.sum;
             arrive_time=rhs.arrive_time;
             start_time=rhs.start_time;
@@ -329,6 +361,7 @@ namespace sjtu {
             if(&rhs==this) return *this;
             strcpy(loc1,rhs.loc1);
             strcpy(loc2,rhs.loc2);
+            strcpy(catalog,rhs.catalog);
             sum=rhs.sum;
             arrive_time=rhs.arrive_time;
             start_time=rhs.start_time;
@@ -344,16 +377,11 @@ namespace sjtu {
             price_num=T.price_num;
             start_time=T.start_time;
             arrive_time=T.arrive_time;
+            strcpy(catalog,T.catalog);
             for(int i=0;i<price_num;++i){
                 strcpy(price_name[i],T.price_name[i]);
                 price[i]=T.price[i];
             }
-        }
-        /*
-         * Set the information when a new ticket is bought.
-         */
-        int buy(Ticket& T,const char *tid,const char* cat,const Date& Da,const char* ticket_kind,const int& num,const char*lc1,const char*lc2){
-            return 1;
         }
     };
     /*

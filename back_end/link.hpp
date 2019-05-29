@@ -19,7 +19,7 @@ namespace sjtu{
     class link{
         private:
             const size_t  blocksize;
-            char  filename[20];
+            char  filename[FILENAME];
             FILE* F;
         public:
             link(const char* f):blocksize(sizeof(value)){
@@ -72,7 +72,7 @@ namespace sjtu{
     template<class value>
     class list{
     private:
-        char  filename[20];
+        char  filename[FILENAME];
         FILE* F;
         int Sz;
         const size_t blocksize;

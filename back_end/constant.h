@@ -28,12 +28,14 @@
 //火车ID大小
 #define  IDSIZE 20
 //价格名称大小
-#define  PRICESIZE 10
+#define  PRICESIZE 15
 //种类大小
-#define  CATSIZE 10
+#define  CATSIZE 2
 
 #define  PRICENUM 5
 
 #define  DAYNUM 30
+
+#define  FILENAME 100
 
 #endif //UNTITLED_CONSTANT_H
