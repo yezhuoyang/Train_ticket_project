@@ -10,13 +10,16 @@
 #include<iostream>
 #include<stdio.h>
 #include<cmath>
+
 //第一个注册用户id
 #define FIRSTID 2019
 //loc大小
 #define LOCSIZE 20
+
 //用户name 大小
 #define NAMESIZE 20
 //用户email大小
+
 //火车名字大小
 #define TRAINNAME 30
 
@@ -25,11 +28,15 @@
 #define  PHONESIZE 20
 //用户密码大小
 #define  PASSSIZE 20
+
 //火车ID大小
 #define  IDSIZE 20
 //价格名称大小
+
+
 #define  PRICESIZE 15
 //种类大小
+
 #define  CATSIZE 2
 
 #define  PRICENUM 5
@@ -41,9 +48,15 @@
 //用户缓存区大小
 #define  UBSIZE 50
 
-
 //车站缓存区大小
 #define  STBSIZE 1000
+
+#define  TRAINBppSIZE 4096
+
+#define  ORDERBppSIZE 4096
+
+#define  TicketBppSIZE 4096
+
 
 
 #endif //UNTITLED_CONSTANT_H

@@ -19,9 +19,9 @@ namespace sjtu{
     }
     class terminal{
         list<User>  User_list;
-        bptree<Trainkey,Train,4096,compare_train> Train_bpp;
-        bptree<Orderkey,Order,4096,compare_order> Order_bpp;
-        bptree<Ticketkey,Ticket,4096,compare_ticket> Ticket_bpp;
+        bptree<Trainkey,Train,TRAINBppSIZE,compare_train> Train_bpp;
+        bptree<Orderkey,Order,ORDERBppSIZE,compare_order> Order_bpp;
+        bptree<Ticketkey,Ticket,TicketBppSIZE,compare_ticket> Ticket_bpp;
         link<Station> Station_link;
         FILE* infoF;//用来管理用户信息的文件
         int current_id;
@@ -238,6 +238,7 @@ namespace sjtu{
               else return 1;
           }
     };
+
     /*
      * TODO 用户已经存在的时候要有特殊返回值
      */
@@ -251,6 +252,7 @@ namespace sjtu{
         ++current_id;
         return 1;
     }
+
 
     int terminal::put_on_sale(const char *tid){
         //std::cout<<"Selling"<<" "<<tid<<std::endl;
@@ -356,7 +358,6 @@ namespace sjtu{
         std::cout<<std::endl;
         return 1;
     }
-
     int terminal::query_profile(const int &id){
         User U;
         if (!User_list.find(id-FIRSTID,U)) return 0;
@@ -397,39 +398,35 @@ namespace sjtu{
             return 0;
         }
         Ticketkey K(train_id,loc1,loc2);
-        vector<pair<Ticketkey,Ticket>> V;
-        Ticket_bpp.search(V,K,compare_ticket());
-        if(V.empty()) {
-            return 0;
-        }
+        Ticket T=Ticket_bpp.find(K,Ticket());
+        if(T.price_num==0) return 0;
         //确定改票种的位置
         int k=0;
-        while(k<V[0].second.price_num&&strcmp(V[0].second.price_name[k],ticket_kind)!=0)++k;
-        if(k==V[0].second.price_num) {
+        while(k<T.price_num&&strcmp(T.price_name[k],ticket_kind)!=0)++k;
+        if(k==T.price_num) {
             return 0;
         }
-        if(V[0].second.remain[k][date.pos]<num) {
+        if(T.remain[k][date.pos]<num) {
             return 0;
         }
-        V[0].second.remain[k][date.pos]-=num;
-        Ticket_bpp.set(V[0].first,V[0].second);
+        T.remain[k][date.pos]-=num;
+        Ticket_bpp.set(K,T);
         Ticketkey K2(train_id,loc2,loc1);
-        Ticket_bpp.set(K2,V[0].second);
-        Orderkey ok(id,date,V[0].first.tid);
-        Order O;
-        if(Order_bpp.count(ok)){
-            O=Order_bpp.find(ok);
+        Ticket_bpp.set(K2,T);
+        Orderkey ok(id,date,train_id);
+        Order O=Order_bpp.find(ok,Order());
+        if(O.sum==0) {
+            O.copy(T);
+            O.remain[k] = num;
+            O.sum = num;
+            strcpy(O.loc1, loc1);
+            strcpy(O.loc2, loc2);
+            Order_bpp.insert(ok, O);
+        }
+        else{
             O.remain[k]+=num;
             O.sum+=num;
             Order_bpp.set(ok,O);
-        }
-        else{
-            O.copy(V[0].second);
-            O.remain[k]=num;
-            O.sum=num;
-            strcpy(O.loc1,loc1);
-            strcpy(O.loc2,loc2);
-            Order_bpp.insert(ok,O);
         }
         return 1;
     }
@@ -464,6 +461,8 @@ namespace sjtu{
         return 1;
     }
 
+
+
     int terminal::add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
         if(Train_bpp.count(K)) return 0;
@@ -486,6 +485,7 @@ namespace sjtu{
         Train_bpp.insert(K,T);
         return 1;
     }
+
 
 
     int terminal::modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
@@ -511,6 +511,7 @@ namespace sjtu{
         Train_bpp.set(K,T);
         return 1;
     }
+
 
     //删掉车次，Station_link里的东西就不管了
     int terminal::delete_train(const char *tid){
