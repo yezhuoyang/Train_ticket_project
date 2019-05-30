@@ -13,7 +13,7 @@ using namespace sjtu;
 
 
 int main(){
-    char r_path[100]="/Users/yezhuoyang/Desktop/ticket_office-DS2019/test_kit/data/";
+    char r_path[100]="../data/";
     char User_file[100];
     strcpy(User_file,r_path);
     char train_file[100];
@@ -38,7 +38,6 @@ int main(){
     strcat(ticket,"ticket.txt");
     strcat(ticketid,"ticketid.txt");
     strcat(station,"station.txt");
-
     terminal T(User_file,train_file,train_id,order,orderid,ticket,ticketid,station);
     int c=1;
     while(c){
