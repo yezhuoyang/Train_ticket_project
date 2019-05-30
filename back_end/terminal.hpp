@@ -251,6 +251,7 @@ namespace sjtu{
         ++current_id;
         return 1;
     }
+
     int terminal::put_on_sale(const char *tid){
         //std::cout<<"Selling"<<" "<<tid<<std::endl;
         Trainkey K(tid);
@@ -284,6 +285,7 @@ namespace sjtu{
         Train_bpp.set(K,T);
         return 1;
     }
+
 /*
      add_train A  Atrain  CD 5 1 商务座
      北京 xx:xx 08:00 00:00 ¥0.0
@@ -471,19 +473,20 @@ namespace sjtu{
         T.station_num = nums;
         T.price_num = nump;
         Station tmp;
-        deque<Station> D;
+        vector<Station> V;
         for (int i = 0; i < nump; ++i){
             std::cin >> T.price_name[i];
         }
         for (int i = 0; i < nums; ++i) {
             tmp.type_num=nump;
             std::cin >>tmp;
-            D.push_back(tmp);
+            V.push_back(tmp);
         }
-        T.stblock=Station_link.push_back(D);
+        T.stblock=Station_link.push_back(V);
         Train_bpp.insert(K,T);
         return 1;
     }
+
 
     int terminal::modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
@@ -495,16 +498,16 @@ namespace sjtu{
         T.station_num = nums;
         T.price_num = nump;
         Station tmp;
-        deque<Station> D;
+        vector<Station> V;
         for (int i = 0; i < nump; ++i){
             std::cin >> T.price_name[i];
         }
         for (int i = 0; i < nums; ++i) {
             tmp.type_num=nump;
             std::cin >>tmp;
-            D.push_back(tmp);
+            V.push_back(tmp);
         }
-        T.stblock=Station_link.push_back(D);
+        T.stblock=Station_link.push_back(V);
         Train_bpp.set(K,T);
         return 1;
     }
@@ -526,6 +529,7 @@ namespace sjtu{
     }
 
 
+
     int terminal::modify_profile(const int &id, const char *name, const char *password, const char *email, const char *phone){
         User U;
         if(!User_list.find(id-FIRSTID,U)) return 0;
@@ -533,6 +537,8 @@ namespace sjtu{
         User_list.modify(id-FIRSTID,U);
         return 1;
     }
+
+
 
 
     int terminal::modify_privilege(const int &id1, const int &id2, const int &privilege){
@@ -545,6 +551,8 @@ namespace sjtu{
         User_list.modify(id2-FIRSTID,U2);
         return 1;
     }
+
+
 
     int terminal::query_train(const char *tid){
         Trainkey K(tid);
@@ -563,6 +571,8 @@ namespace sjtu{
         std::cout << std::endl;
         return 1;
     }
+
+
 
 
     int terminal::query_ticket(const char *lc1, const char *lc2, const Date &D, const char *cat){
@@ -588,8 +598,6 @@ namespace sjtu{
         }
         return 1;
     }
-
-
 
 
 

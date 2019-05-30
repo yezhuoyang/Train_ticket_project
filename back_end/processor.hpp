@@ -12,6 +12,8 @@ namespace sjtu{
     char MaxC[10];
     char  MinC[2];
     int current_id;
+
+
     int Register(const char *name, const char *pass, const char *email, const char *phone){
         User U;
         U.modify(name, pass, email, phone);

@@ -10,10 +10,9 @@ using namespace sjtu;
 
 
 
-
-
 int main(){
-    char r_path[100]="../data/";
+
+    char r_path[100]="/Users/yezhuoyang/Desktop/ticket_office-DS2019/test_kit/data/";
     char User_file[100];
     strcpy(User_file,r_path);
     char train_file[100];
@@ -43,6 +42,7 @@ int main(){
     while(c){
         c=T.execute();
     }
+
 
 }
 
