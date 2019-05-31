@@ -6,9 +6,11 @@
 #include "../back_end/terminal.hpp"
 
 
+
+
 using namespace sjtu;
 int main(){
-    char r_path[100]="data/";
+    char r_path[100]="./";
     char User_file[100];
     strcpy(User_file,r_path);
     char train_file[100];

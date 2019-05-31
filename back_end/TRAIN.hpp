@@ -200,8 +200,6 @@ namespace sjtu {
     };
 
 
-
-
     /*
      * The ticket structure to be stored in ticket bptree;
      * All train that passed by loc.
@@ -331,7 +329,6 @@ namespace sjtu {
                     }
             }
     };
-
 
 
 

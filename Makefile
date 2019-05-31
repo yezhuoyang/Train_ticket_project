@@ -14,4 +14,4 @@ code.o: front_end/code.cpp
 
 
 clean:
-	rm code *.o data/*.txt
+	rm code *.o *.txt
