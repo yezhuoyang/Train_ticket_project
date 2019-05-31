@@ -13,7 +13,6 @@ namespace sjtu{
     void print(const Trainkey& Tkey,const Train& T){
          std::cout<<Tkey.train_id<<" "<<T.name<<std::endl;
     }
-
     void print1(const myTicketkey& Tkey,const myTicket& T){
         std::cout<<Tkey.tid<<" "<<Tkey.loc<<" "<<T.K<<" "<<" "<<T.catlog<<std::endl;
     }
@@ -280,7 +279,6 @@ namespace sjtu{
     };
 
 
-
     int terminal::Register(const char *name, const char *pass, const char *email, const char *phone) {
         User U;
         U.modify(name, pass, email, phone);
@@ -291,7 +289,6 @@ namespace sjtu{
         ++current_id;
         return 1;
     }
-
 
 
     int terminal::put_on_sale(const char *tid){

@@ -440,10 +440,6 @@ namespace sjtu {
     };
 
 
-
-
-
-
     class search_order{
     public:
         bool operator () (const Orderkey& T1,const Orderkey& T2) const {
@@ -455,14 +451,6 @@ namespace sjtu {
             }
         }
     };
-
-
-
-
-
-
-
-
 
 
 
