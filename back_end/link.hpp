@@ -20,19 +20,20 @@ namespace sjtu{
         private:
             const size_t  blocksize;
             char  filename[FILENAME];
-            value buffer[STBSIZE];
+            value buffer[BUFFERSIZE];
             int  bufpos;
             int  bufsize;
+            const int maxbuf;
             int Sz;
             FILE* F;
         public:
-            link(const char* f):blocksize(sizeof(value)) {
+            link(const char* f,int MB):blocksize(sizeof(value)),maxbuf(MB){
                 strcpy(filename, f);
                 F = fopen(filename, "rb+");
                 if (F == NULL) {
                     F = fopen(filename, "wb+");
                 }
-                fseek(F, 0, SEEK_END);
+                fseek(F,0,SEEK_END);
                 Sz = ftell(F) / blocksize;
                 bufpos = Sz;
                 bufsize = 0;
@@ -43,7 +44,7 @@ namespace sjtu{
             }
             block push_back(vector<value>& V){
                 int preSz=Sz;
-                if(V.size()>=STBSIZE){
+                if(V.size()>=maxbuf){
                     flushbuffer();
                     fseek(F,0,SEEK_END);
                     value buffer[V.size()];
@@ -56,7 +57,7 @@ namespace sjtu{
                     Sz+=V.size();
                     return block(V.size(),preSz);
                 }
-                if(bufsize+V.size()>=STBSIZE){
+                if(bufsize+V.size()>=maxbuf){
                      flushbuffer();
                 }
                 for(typename  vector<value>::iterator it=V.begin();it!=V.end();++it){
@@ -97,7 +98,18 @@ namespace sjtu{
                 bufsize=0;
                 bufpos=Sz;
             }
+            void modify(const block&B,vector<value> V){
+                flushbuffer();
+                value A[V.size()];
+                for(int i=0;i<V.size();++i){
+                    A[i]=V[i];
+                }
+                fseek(F,B.pos*blocksize,SEEK_SET);
+                fwrite(A,blocksize,V.size(),F);
+                fflush(F);
+            }
     };
+
 
 
     template<class value>
@@ -107,13 +119,14 @@ namespace sjtu{
         FILE* F;
         int Sz;
         const size_t blocksize;
-        value buffer[UBSIZE];
+        value buffer[BUFFERSIZE];
         //缓存区首对应的元素位置
         int   bufpos;
         //缓存区大小
         int   bufsize;
+        const int maxbuf;
     public:
-        list(const char* FN):blocksize(sizeof(value)){
+        list(const char* FN,const int& MB):blocksize(sizeof(value)),maxbuf(MB){
             bufsize=0;
             strcpy(filename,FN);
             F=fopen(filename,"rb+");
@@ -142,15 +155,13 @@ namespace sjtu{
         }
 
         int push_back(const value& V){
-            if(bufsize>=UBSIZE){
+            if(bufsize>=maxbuf){
                 flushbuffer();
             }
             buffer[bufsize++]=V;
             ++Sz;
             return 1;
         }
-
-
         int modify(const int&pos,const value& V){
             if(pos>=Sz) return 0;
             if(pos>=bufpos){
@@ -174,8 +185,6 @@ namespace sjtu{
             fread(&V,blocksize,1,F);
             return 1;
         }
-
-
         void flushbuffer(){
             fseek(F,0,SEEK_END);
             fwrite(buffer,blocksize,bufsize,F);

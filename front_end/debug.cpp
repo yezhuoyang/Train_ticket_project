@@ -11,7 +11,6 @@ using namespace sjtu;
 
 
 int main(){
-
     char r_path[100]="/Users/yezhuoyang/Desktop/ticket_office-DS2019/test_kit/data/";
     char User_file[100];
     strcpy(User_file,r_path);
@@ -29,6 +28,10 @@ int main(){
     strcpy(ticketid,r_path);
     char station[100];
     strcpy(station,r_path);
+    char remain[100];
+    strcpy(remain,r_path);
+
+
     strcat(User_file,"User.txt");
     strcat(train_file,"train.txt");
     strcat(train_id,"trainid.txt");
@@ -37,7 +40,8 @@ int main(){
     strcat(ticket,"ticket.txt");
     strcat(ticketid,"ticketid.txt");
     strcat(station,"station.txt");
-    terminal T(User_file,train_file,train_id,order,orderid,ticket,ticketid,station);
+    strcat(remain,"remain.txt");
+    terminal T(User_file,train_file,train_id,order,orderid,ticket,ticketid,station,remain);
     int c=1;
     while(c){
         c=T.execute();

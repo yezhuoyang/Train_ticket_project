@@ -32,12 +32,10 @@
 //火车ID大小
 #define  IDSIZE 20
 //价格名称大小
-
-
 #define  PRICESIZE 15
 //种类大小
-
 #define  CATSIZE 2
+
 
 #define  PRICENUM 5
 
@@ -57,6 +55,9 @@
 
 #define  TicketBppSIZE 4096
 
+#define  BUFFERSIZE 500
+
+#define   REMAINSIZE 1000
 
 
 #endif //UNTITLED_CONSTANT_H
