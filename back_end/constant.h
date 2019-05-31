@@ -20,6 +20,7 @@
 #define NAMESIZE 20
 //用户email大小
 
+
 //火车名字大小
 #define TRAINNAME 30
 
@@ -35,7 +36,6 @@
 #define  PRICESIZE 15
 //种类大小
 #define  CATSIZE 2
-
 
 #define  PRICENUM 5
 
@@ -55,9 +55,9 @@
 
 #define  TicketBppSIZE 4096
 
-#define  BUFFERSIZE 500
+#define  BUFFERSIZE  12000
 
-#define   REMAINSIZE 1000
+#define   REMAINSIZE 10000
 
 
 #endif //UNTITLED_CONSTANT_H

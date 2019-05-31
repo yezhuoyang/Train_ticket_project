@@ -603,6 +603,7 @@ namespace sjtu{
     }
 
 
+
     int terminal::add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
         if(Train_bpp.count(K)) return 0;

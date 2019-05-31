@@ -137,8 +137,6 @@ namespace sjtu{
             Sz=ftell(F)/blocksize;
             bufpos=Sz;
         }
-
-
         ~list(){
             flushbuffer();
             fclose(F);
