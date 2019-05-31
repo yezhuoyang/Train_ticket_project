@@ -29,8 +29,6 @@ namespace  sjtu {
     }
 
 
-
-
     struct Date {
         char date[13];
         /*
@@ -99,6 +97,11 @@ namespace  sjtu {
         }
     };
     std::ostream &operator<<(std::ostream& os,const Date& D){
+         if(D.pos==30){
+             char tmp[15]={"2019-07-01"};
+             os<<tmp;
+             return os;
+         }
          char tmp[15]={"2019-06-00"};
          int x=(D.pos+1)/10;
          int y=D.pos+1-10*x;
@@ -122,8 +125,10 @@ namespace  sjtu {
         if(strcmp(T.time,"XX:XX")==0){
             T.hour=T.minute=0;
         }
-        T.hour=10*(T.time[0]-'0')+(T.time[1]-'0');
-        T.minute=10*(T.time[3]-'0')+(T.time[4]-'0');
+        else{
+            T.hour=10*(T.time[0]-'0')+(T.time[1]-'0');
+            T.minute=10*(T.time[3]-'0')+(T.time[4]-'0');
+        }
         return is;
     }
     bool operator>(const Date&D1,const Date &D2){

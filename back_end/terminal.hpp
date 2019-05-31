@@ -626,7 +626,9 @@ namespace sjtu{
         for (int i = 0; i < nums; ++i){
             tmp.type_num=nump;
             std::cin >>tmp;
-            if(tmp.arrive_time.hour<prehour)++predate;
+            if(i>0&&(tmp.arrive_time.hour<prehour||(tmp.start_time.hour<tmp.arrive_time.hour))){
+                ++predate;
+            }
             prehour=tmp.start_time.hour;
             tmp.ad=predate;
             V.push_back(tmp);
@@ -635,9 +637,6 @@ namespace sjtu{
         Train_bpp.insert(K,T);
         return 1;
     }
-
-
-
     int terminal::modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
         if(!Train_bpp.count(K)) return 0;
