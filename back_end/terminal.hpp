@@ -118,7 +118,6 @@ namespace sjtu{
              }
              return remain_link.push_back(V);
          }
-
          /*
           * 减去某个列车的一部分剩余车票
           * d:要修改的哪天
@@ -430,8 +429,8 @@ namespace sjtu{
         /*
          *  输出票价信息,要检查表达式是否正确
          */
-        std::cout<<V1[x].first.tid<<" "<<ST1[V1[x].second.K].loc<<" "<<D<<" "<<ST1[V1[x].second.K].start_time<<" ";
-        std::cout<<ST1[k1].loc<<" "<<D<<" "<<ST1[k1].arrive_time<<" ";
+        std::cout<<V1[x].first.tid<<" "<<ST1[V1[x].second.K].loc<<" "<<D+ST1[V1[x].second.K].ad<<" "<<ST1[V1[x].second.K].start_time<<" ";
+        std::cout<<ST1[k1].loc<<" "<<D+ST1[k1].ad<<" "<<ST1[k1].arrive_time<<" ";
         for(int i=0;i<T1list[x].price_num;++i){
             std::cout<<T1list[x].price_name[i]<<" "<<R1[D.pos*T1list[x].price_num*T1list[x].station_num*T1list[x].station_num \
             +i*T1list[x].station_num*T1list[x].station_num+V1[x].second.K*T1list[x].station_num+k1]<<" "<<P1[i]<<" ";
@@ -439,8 +438,8 @@ namespace sjtu{
 
 
         std::cout<<std::endl;
-        std::cout<<V2[y].first.tid<<" "<<ST2[k2].loc<<" "<<D<<" "<<ST2[k2].start_time<<" ";
-        std::cout<<ST2[V2[y].second.K].loc<<" "<<D<<" "<<ST2[V2[y].second.K].arrive_time<<" ";
+        std::cout<<V2[y].first.tid<<" "<<ST2[k2].loc<<" "<<D+ST2[k2].ad<<" "<<ST2[k2].start_time<<" ";
+        std::cout<<ST2[V2[y].second.K].loc<<" "<<D+ST2[V2[y].second.K].ad<<" "<<ST2[V2[y].second.K].arrive_time<<" ";
         for(int i=0;i<T2list[y].price_num;++i){
             std::cout<<T2list[y].price_name[i]<<" "<<R2[D.pos*T2list[y].price_num*T2list[y].station_num*T2list[y].station_num \
             +i*T2list[y].station_num*T2list[y].station_num+ k2*T2list[y].station_num+V2[y].second.K]<<" "<<P2[i]<<" ";
@@ -448,6 +447,7 @@ namespace sjtu{
         std::cout<<std::endl;
         return 1;
     }
+
 
     int terminal::query_profile(const int &id){
         User U;
@@ -490,8 +490,11 @@ namespace sjtu{
                         P[j]+=ST[k].price[j];
                     }
               }
-              std::cout<<Vfound[i].first.train_id<<" "<<ST[Vfound[i].second.x].loc<<" "<<date<<" "<<ST[Vfound[i].second.x].start_time<<" ";
-              std::cout<<ST[Vfound[i].second.y].loc<<" "<<date<<" "<<ST[Vfound[i].second.y].arrive_time<<" ";
+              /*
+               *
+               */
+              std::cout<<Vfound[i].first.train_id<<" "<<ST[Vfound[i].second.x].loc<<" "<<date+ST[Vfound[i].second.x].ad<<" "<<ST[Vfound[i].second.x].start_time<<" ";
+              std::cout<<ST[Vfound[i].second.y].loc<<" "<<date+ST[Vfound[i].second.y].ad<<" "<<ST[Vfound[i].second.y].arrive_time<<" ";
               for(int j=0;j<T.price_num;++j){
                   std::cout<<T.price_name[j]<<" "<<Vfound[i].second.num[j]<<" "<<P[j]<<" ";
               }
@@ -499,7 +502,6 @@ namespace sjtu{
         }
         return 1;
     }
-
 
 
 
@@ -591,25 +593,17 @@ namespace sjtu{
             if(strcmp(V[i].loc,loc2)==0) y=i;
         }
         if(x==-1||y==-1) return 0;
-
-
         sjtu::vector<int> V1;
         remain_link.read_block(T.rblock,V1);
-
         del_remain(V1,date.pos,T.price_num,k,T.station_num,x,y,-num);
         remain_link.modify(T.rblock,V1);
-
-
-
         //如果这个order买的总票数为0了，就删掉
         if(!mO.sum) MyOrder_bpp.remove(okey);
         else{
             MyOrder_bpp.set(okey,mO);
         }
-
         return 1;
     }
-
 
 
     int terminal::add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
@@ -625,9 +619,16 @@ namespace sjtu{
         for (int i = 0; i < nump; ++i){
             std::cin >> T.price_name[i];
         }
-        for (int i = 0; i < nums; ++i) {
+        //第一班车的日期就是当前日期
+        int predate=0;
+        //上一班车的发车时间
+        int prehour=-1;
+        for (int i = 0; i < nums; ++i){
             tmp.type_num=nump;
             std::cin >>tmp;
+            if(tmp.arrive_time.hour<prehour)++predate;
+            prehour=tmp.start_time.hour;
+            tmp.ad=predate;
             V.push_back(tmp);
         }
         T.stblock=Station_link.push_back(V);
@@ -651,9 +652,16 @@ namespace sjtu{
         for (int i = 0; i < nump; ++i){
             std::cin >> T.price_name[i];
         }
+        //第一班车的日期就是当前日期
+        int predate=0;
+        //上一班车的发车时间
+        int prehour=-1;
         for (int i = 0; i < nums; ++i) {
             tmp.type_num=nump;
             std::cin >>tmp;
+            if(tmp.arrive_time.hour<prehour)++predate;
+            prehour=tmp.start_time.hour;
+            tmp.ad=predate;
             V.push_back(tmp);
         }
         T.stblock=Station_link.push_back(V);
@@ -692,6 +700,7 @@ namespace sjtu{
     }
 
 
+
     int terminal::modify_privilege(const int &id1, const int &id2, const int &privilege){
         User U1, U2;
         if (!User_list.find(id1-FIRSTID,U1)) return 0;
@@ -723,8 +732,8 @@ namespace sjtu{
 
 
     void print_ticket(const char* tid,const  sjtu::vector<Station>& ST,const Train& T,const sjtu::vector<int>& RM,const Date& d,const int&x,const int&y){
-        std::cout<<tid<<" "<<ST[x].loc<<" "<<d<<" "<<ST[x].start_time<<" ";
-        std::cout<<ST[y].loc<<" "<<d<<" "<<ST[y].arrive_time<<" ";
+        std::cout<<tid<<" "<<ST[x].loc<<" "<<d+ST[x].ad<<" "<<ST[x].start_time<<" ";
+        std::cout<<ST[y].loc<<" "<<d+ST[y].ad<<" "<<ST[y].arrive_time<<" ";
         /*
          * 计算需要输出的价格
          */
@@ -742,7 +751,6 @@ namespace sjtu{
     }
 
 
-
     int terminal::query_ticket(const char *lc1, const char *lc2, const Date &D, const char *cat){
         myTicketkey K1("\0",lc1);
         myTicketkey K2("\0",lc2);
@@ -752,7 +760,6 @@ namespace sjtu{
         MyTicket_bpp.search(V20,K2,compare_myticket());
         vector<pair<myTicketkey,myTicket>> V1;
         vector<pair<myTicketkey,myTicket>> V2;
-
         for(int i=0;i<V10.size();++i){
             if(strstr(cat,V10[i].second.catlog)!=NULL)
                 V1.push_back(V10[i]);
@@ -778,7 +785,6 @@ namespace sjtu{
                 }
             }
         }
-
         if(F.empty()) return 0;
         std::cout<<F.size()<<std::endl;
         sjtu::vector<Station> ST;

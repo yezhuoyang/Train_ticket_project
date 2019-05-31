@@ -27,6 +27,10 @@ namespace  sjtu {
     int date_to_int(const char list[]){
         return 10*(list[8]-'0')+(list[9]-'1');
     }
+
+
+
+
     struct Date {
         char date[13];
         /*
@@ -34,18 +38,21 @@ namespace  sjtu {
          * 0 denotes 2019-06-01
          */
         int  pos;
-        Date(){strcpy(date,"XXXX—XX—XX");}
+        Date(){pos=0;}
         Date(const char*D){
-            strcpy(date,D);
-            pos=date_to_int(date);
+            pos=date_to_int(D);
         }
         Date& operator=(const Date& rhs){
             if(&rhs==this) return *this;
-            strcpy(date,rhs.date);
             pos=rhs.pos;
             return *this;
         }
     };
+    Date operator+(const Date& d,const int&k){
+           Date tmp(d);
+           tmp.pos+=k;
+           return tmp;
+    }
 //时间类
     struct Time {
         int hour;
@@ -53,8 +60,13 @@ namespace  sjtu {
         char time[6];
         Time(const char* T){
             strcpy(time,T);
-            hour=10*time[0]+time[1];
-            minute=10*time[3]+time[4];
+            if(strcmp(T,"XX:XX")==0){
+                hour=minute=0;
+            }
+            else{
+                hour=10*time[0]+time[1];
+                minute=10*time[3]+time[4];
+            }
         }
         Time(){
             strcpy(time,"XX:XX");
@@ -80,16 +92,25 @@ namespace  sjtu {
             return *this;
         }
         int operator-(const Time& rhs){
+            if(rhs.hour>hour){
+                return (hour+24-rhs.hour)*60+minute-rhs.minute;
+            }
             return (hour-rhs.hour)*60+minute-rhs.minute;
         }
     };
     std::ostream &operator<<(std::ostream& os,const Date& D){
-         os<<D.date;
+         char tmp[15]={"2019-06-00"};
+         int x=(D.pos+1)/10;
+         int y=D.pos+1-10*x;
+         tmp[strlen(tmp)-1]='0'+y;
+         tmp[strlen(tmp)-2]='0'+x;
+         os<<tmp;
          return os;
     }
     std::istream &operator>>(std::istream& is,Date& D){
-        is>>D.date;
-        D.pos=date_to_int(D.date);
+        char tmp[15]={"2019-06-00"};
+        is>>tmp;
+        D.pos=date_to_int(tmp);
         return is;
     }
     std::ostream& operator<<(std::ostream &os,const Time& T){
@@ -98,6 +119,9 @@ namespace  sjtu {
     }
     std::istream& operator>>(std::istream &is,Time& T){
         is>>T.time;
+        if(strcmp(T.time,"XX:XX")==0){
+            T.hour=T.minute=0;
+        }
         T.hour=10*(T.time[0]-'0')+(T.time[1]-'0');
         T.minute=10*(T.time[3]-'0')+(T.time[4]-'0');
         return is;

@@ -26,6 +26,8 @@ namespace sjtu {
 
     struct Station{
         char loc[LOCSIZE];
+        //某站出发的车票和第一站出发的车票隔的天数
+        int  ad;
         Time arrive_time,start_time,stop_time;
         double price[PRICENUM];
         int type_num;
@@ -35,6 +37,7 @@ namespace sjtu {
             start_time=rhs.start_time;
             stop_time=rhs.stop_time;
             type_num=rhs.type_num;
+            ad=rhs.ad;
             for(int i=0;i<type_num;++i){
                 price[i]=rhs.price[i];
             }
@@ -42,6 +45,7 @@ namespace sjtu {
             return *this;
         }
         Station(const Station& rhs){
+            ad=rhs.ad;
             arrive_time=rhs.arrive_time;
             start_time=rhs.start_time;
             stop_time=rhs.stop_time;
@@ -51,7 +55,7 @@ namespace sjtu {
             }
             strcpy(loc,rhs.loc);
         }
-        Station(){type_num=0;}
+        Station(){type_num=0;ad=0;}
     };
 
     std::istream& operator>>(std::istream &is,Station& S){
@@ -466,9 +470,6 @@ namespace sjtu {
             }
         }
     };
-
-
-
 
     struct Order{
         char loc1[LOCSIZE],loc2[LOCSIZE];
