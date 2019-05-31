@@ -7,13 +7,9 @@
 
 
 
+
 namespace sjtu{
     class bufferpool{
-
-
-
-
-
 
 
 

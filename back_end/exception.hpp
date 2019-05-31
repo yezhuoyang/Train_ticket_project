@@ -20,10 +20,6 @@ public:
         return variant + " " + detail;
     }
 };
-
-
-
-
 class index_out_of_bound : public exception {
     /* __________________________ */
 };
