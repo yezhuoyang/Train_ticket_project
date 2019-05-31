@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5.2)
 
 
 
-project(debug)
+project(code)
 
 
 set(CMAKE_CXX_STANDARD 14)
@@ -13,6 +13,6 @@ include_directories()
 
 
 
-add_executable(debug
-        front_end/debug.cpp
+add_executable(code
+        front_end/code.cpp
 )
