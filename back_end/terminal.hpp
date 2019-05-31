@@ -118,6 +118,7 @@ namespace sjtu{
              }
              return remain_link.push_back(V);
          }
+
          /*
           * 减去某个列车的一部分剩余车票
           * d:要修改的哪天
@@ -127,12 +128,23 @@ namespace sjtu{
           * x:出发位置
           * y:到达位置
           */
-         void del_remain(vector<int>& V,const int&d,const int& K,const int&k,const int& P, const int& x,const int& y,const int& num){
-             int R=d*K*P*P+k*P*P;
-             for(int i=x;i<y;++i){
-                for(int j=x+1;j<=y;++j){
-                    V[R+i*P+j]-=num;
-                }
+         void del_remain(vector<int>& V,const int&d,const int& K,const int&k,const int& P, const int& x,const int& y,const int& num) {
+             int R = d * K * P * P + k * P * P;
+             /*
+              * 对于x之前车站发车的车票，到站位置大于x的都需要减
+              */
+             for (int i = 0; i < x; ++i) {
+                    for(int j=x+1;j<P;++j){
+                        V[R + i * P + j] -= num;
+                    }
+             }
+             /*
+              * 对于x之后,y之前发车的车票,所有到站位置在后面的都要减
+              */
+             for (int i = x; i < y; ++i) {
+                 for(int j=i+1;j<P;++j){
+                     V[R + i * P + j] -= num;
+                 }
              }
          }
     public:
