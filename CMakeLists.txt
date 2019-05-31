@@ -9,8 +9,11 @@ project(code)
 set(CMAKE_CXX_STANDARD 14)
 
 
-include_directories()
 
+SET(EXECUTABLE_OUTPUT_PATH ../)
+
+
+include_directories()
 
 
 add_executable(code
