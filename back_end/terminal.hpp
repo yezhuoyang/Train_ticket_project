@@ -14,9 +14,8 @@ namespace sjtu{
          std::cout<<Tkey.train_id<<" "<<T.name<<std::endl;
     }
     void print1(const myTicketkey& Tkey,const myTicket& T){
-        std::cout<<Tkey.tid<<" "<<Tkey.loc<<" "<<T.K<<" "<<" "<<T.catlog<<std::endl;
+        std::cout<<Tkey.tid<<" "<<Tkey.loc<<"mak "<<T.K<<" "<<" "<<T.catlog<<std::endl;
     }
-
     void print3(const myOrderkey& Okey,const myOrder& O){
         std::cout<<Okey.train_id<<" "<<Okey.Uid<<" "<<Okey.D<<" "<<O.catalog<<" "<<O.x<<" "<<O.y<<std::endl;
     }
