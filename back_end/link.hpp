@@ -98,6 +98,7 @@ namespace sjtu{
                 bufsize=0;
                 bufpos=Sz;
             }
+
             void modify(const block&B,vector<value> V){
                 flushbuffer();
                 value A[V.size()];
@@ -108,6 +109,8 @@ namespace sjtu{
                 fwrite(A,blocksize,V.size(),F);
                 fflush(F);
             }
+
+
     };
 
 

@@ -43,11 +43,14 @@
 
 #define  FILENAME 100
 
+
+
 //用户缓存区大小
-#define  UBSIZE 50
+#define  UBSIZE 40
+
 
 //车站缓存区大小
-#define  STBSIZE 1000
+#define  STBSIZE 500
 
 #define  TRAINBppSIZE 4096
 
@@ -55,9 +58,9 @@
 
 #define  TicketBppSIZE 4096
 
-#define  BUFFERSIZE  12000
+#define  BUFFERSIZE  1200
 
-#define   REMAINSIZE 10000
+#define   REMAINSIZE 800
 
 
 #endif //UNTITLED_CONSTANT_H

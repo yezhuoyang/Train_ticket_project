@@ -9,6 +9,7 @@
 #include "constant.h"
 
 
+
 namespace  sjtu {
     /*
      * The function convert hour ab and minute cd to string "ab:cd"

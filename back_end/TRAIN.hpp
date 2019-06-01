@@ -22,8 +22,6 @@ namespace sjtu {
         num = num * pow(10, -(pos - dig - 1));
         return num;
     }
-
-
     struct Station{
         char loc[LOCSIZE];
         //某站出发的车票和第一站出发的车票隔的天数
@@ -88,6 +86,7 @@ namespace sjtu {
             return strcmp(T1.train_id,T2.train_id)<0;
         }
     };
+
     struct Train {
             char name[TRAINNAME];
             char catalog[CATSIZE];
@@ -143,6 +142,8 @@ namespace sjtu {
     struct myTicketkey{
             char loc[LOCSIZE];
             char tid[IDSIZE];
+
+
             myTicketkey(const char*id,const char* lc){
                 strcpy(tid,id);
                 strcpy(loc,lc);
@@ -168,6 +169,13 @@ namespace sjtu {
             char catlog[CATSIZE];
             //存储myTicketkey中的 loc是 train_id的第几站
             int K;
+
+            //存放Station在文件中存放的位置
+            block stblock;
+            //存放剩余车票数据块
+            block rblock;
+
+
             myTicket(const bool& B,const char* cat){
                 exist=B;
                 strcpy(catlog,cat);
@@ -179,12 +187,16 @@ namespace sjtu {
                 exist=rhs.exist;
                 K=rhs.K;
                 strcpy(catlog,rhs.catlog);
+                stblock=rhs.stblock;
+                rblock=rhs.rblock;
             }
             myTicket&  operator=(const myTicket& rhs){
                 if(&rhs==this) return *this;
                 strcpy(catlog,rhs.catlog);
                 exist=rhs.exist;
                 K=rhs.K;
+                stblock=rhs.stblock;
+                rblock=rhs.rblock;
                 return *this;
             }
     };
@@ -202,6 +214,21 @@ namespace sjtu {
             return false;
         }
     };
+
+
+
+
+    class search_myticket{
+    public:
+        bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
+            if(strcmp(T1.loc,T2.loc)<0) return true;
+            return false;
+        }
+    };
+
+
+
+
 
 
     /*
@@ -333,8 +360,6 @@ namespace sjtu {
                     }
             }
     };
-
-
 
 
     struct myOrderkey{
