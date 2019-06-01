@@ -13,7 +13,7 @@
 #include "utility.hpp"
 constexpr off_t invalid_off = 0xdeadbeef;
 //
-template <class key_t, class value_t, size_t node_size = 4096, size_t poolsize = 3, class Compare = std::less<key_t>>
+template <class key_t, class value_t, size_t node_size = 4096, size_t poolsize = 283, class Compare = std::less<key_t>>
 class bptree{
     const char tree_t = '0';
     const char block_t = '1';
