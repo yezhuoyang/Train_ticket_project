@@ -471,6 +471,7 @@ private:
         memcpy(buffer + sizeof(char) + sizeof(block) + (sizeof(value_t) + sizeof(key_t))*load_block(buffer)->sz,
                tmp + sizeof(char) + sizeof(block),sizeof(value_t) + sizeof(key_t));
         load_block(buffer)->sz++;
+        key_t new_key = *fetchk_b(0, tmp);
         remove_begin_b(*load_block(tmp), tmp);
 
         if(flag){
@@ -483,7 +484,7 @@ private:
         bufferpool[(load_block(buffer)->pos) % poolsize].state = changed;
 
         read_in(fa_link[pfa_link]);
-        *fetchk_t(mid, buffer) = *fetchk_b(0, tmp);
+        *fetchk_t(mid, buffer) = new_key;
         bufferpool[fa_link[pfa_link]%poolsize].state = changed;
     }
     void remove_help_b3(char *tmp, key_t midkey, size_t mid, bool flag){
