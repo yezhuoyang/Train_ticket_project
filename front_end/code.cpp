@@ -4,13 +4,6 @@
 
 
 #include "../back_end/terminal.hpp"
-
-
-
-
-
-
-
 using namespace sjtu;
 int main(){
     char r_path[100]="./";
@@ -46,8 +39,6 @@ int main(){
     while(c){
         c=T.execute();
     }
-
-
 
 }
 

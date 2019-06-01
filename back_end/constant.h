@@ -41,13 +41,11 @@
 
 #define  DAYNUM 30
 
+
 #define  FILENAME 100
-
-
 
 //用户缓存区大小
 #define  UBSIZE 40
-
 
 //车站缓存区大小
 #define  STBSIZE 500

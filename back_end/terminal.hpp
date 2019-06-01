@@ -127,7 +127,7 @@ namespace sjtu{
           * x:出发位置
           * y:到达位置
           */
-         void del_remain(vector<int>& V,const int&d,const int& K,const int&k,const int& P, const int& x,const int& y,const int& num) {
+         void del_remain(vector<int>& V,const int&d,const int& K,const int&k,const int& P, const int& x,const int& y,const int& num){
              int R = d * K * P * P + k * P * P;
              /*
               * 对于x之前车站发车的车票，到站位置大于x的都需要减
@@ -146,6 +146,9 @@ namespace sjtu{
                  }
              }
          }
+
+
+
     public:
           terminal(const char* uf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
                   const char* stationfile,const char* remainfile):User_list(uf,UBSIZE),Train_bpp(Tf,Tfid),MyOrder_bpp(of,ofid),MyTicket_bpp(tf,tfid),
@@ -287,8 +290,6 @@ namespace sjtu{
               else return 1;
           }
     };
-
-
     int terminal::Register(const char *name, const char *pass, const char *email, const char *phone) {
         User U;
         U.modify(name, pass, email, phone);
@@ -306,25 +307,11 @@ namespace sjtu{
             return 0;
         }
         T.For_sale=true;
-        sjtu::vector<Station> V;
-        Station_link.read_block(T.stblock,V);
-        T.rblock=add_remain(T.price_num,T.station_num);
-        myTicket mT(true,T.catalog);
-        mT.rblock=T.rblock;
-        mT.stblock=T.stblock;
-        /*
-         * 所有经过某站点loc的信息都要存到 MyTicket_bpp中去
-         */
-        for(int i=0;i<T.station_num;++i){
-            /*
-             * 用K标记这张票的loc对应的是该train的哪个station
-             */
-            mT.K=i;
-            MyTicket_bpp.insert(myTicketkey(tid,V[i].loc),mT);
-        }
         Train_bpp.set(K,T);
         return 1;
     }
+
+
     int terminal::query_transfer(const char *loc1, const char *loc2, const Date &D, const char *cat){
         myTicketkey K1("\0",loc1);
         myTicketkey K2("\0",loc2);
@@ -341,7 +328,6 @@ namespace sjtu{
             if(strstr(cat,V10[i].second.catlog)!=NULL)
                 V1.push_back(V10[i]);
         }
-
         for(int i=0;i<V20.size();++i){
             if(strstr(cat,V20[i].second.catlog)!=NULL)
                 V2.push_back(V20[i]);
@@ -442,8 +428,6 @@ namespace sjtu{
         std::cout<<std::endl;
         return 1;
     }
-
-
     int terminal::query_profile(const int &id){
         User U;
         if (!User_list.find(id-FIRSTID,U)) return 0;
@@ -503,7 +487,7 @@ namespace sjtu{
             return 0;
         }
         Train T=Train_bpp.find(Trainkey(train_id));
-        if(!T.station_num) return 0;
+        if(!T.station_num||!T.For_sale) return 0;
         /*
          * 读入车站的信息
          */
@@ -532,10 +516,10 @@ namespace sjtu{
          * 减去相应的剩余车票
          */
         del_remain(V1,date.pos,T.price_num,k,T.station_num,x,y,num);
-        //remain_link.modify(T.rblock,V1);
+        remain_link.modify(T.rblock,V1);
         myOrderkey ok(id,date,train_id);
         myOrder O=MyOrder_bpp.find(ok);
-        if(O.sum==0) {
+        if(O.sum==0){
             O.x=x;O.y=y;
             O.sum=num;
             O.num[k]=num;
@@ -547,13 +531,6 @@ namespace sjtu{
             O.sum+=num;
             MyOrder_bpp.set(ok,O);
         }
-        myOrderkey ok(id,date,train_id);
-        myOrder O;
-        O.x=x;O.y=y;
-        O.sum=num;
-        O.num[k]=num;
-        strcpy(O.catalog,T.catalog);
-        MyOrder_bpp.insert(ok, O);
         return 1;
     }
 
@@ -596,24 +573,28 @@ namespace sjtu{
     }
 
 
+
+
     int terminal::add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
-        if(Train_bpp.count(K)) return 0;
-        Train T;
+        Train T=Train_bpp.find(K);
+        if(T.station_num){
+            return 0;
+        }
         strcpy(T.name, name);
         strcpy(T.catalog, catalog);
-        T.station_num = nums;
-        T.price_num = nump;
+        T.station_num=nums;
+        T.price_num=nump;
         Station tmp;
-        vector<Station> V;
-        for (int i = 0; i < nump; ++i){
+        for (int i=0;i<nump;++i){
             std::cin >> T.price_name[i];
         }
         //第一班车的日期就是当前日期
         int predate=0;
         //上一班车的发车时间
         int prehour=-1;
-        for (int i = 0; i < nums; ++i){
+        vector<Station> V;
+        for(int i = 0; i < nums; ++i){
             tmp.type_num=nump;
             std::cin >>tmp;
             if(i>0&&(tmp.arrive_time.hour<prehour||(tmp.start_time.hour<tmp.arrive_time.hour))){
@@ -624,20 +605,43 @@ namespace sjtu{
             V.push_back(tmp);
         }
         T.stblock=Station_link.push_back(V);
+        T.rblock=add_remain(T.price_num,T.station_num);
+        myTicket mT(true,T.catalog);
+        /*
+         * 所有经过某站点loc的信息都要存到 MyTicket_bpp中去
+         */
+        for(int i=0;i<T.station_num;++i){
+            /*
+             * 用K标记这张票的loc对应的是该train的哪个station
+             */
+            mT.K=i;
+            MyTicket_bpp.insert(myTicketkey(train_id,V[i].loc),mT);
+        }
+
         Train_bpp.insert(K,T);
         return 1;
     }
+
+
+
     int terminal::modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
-        if(!Train_bpp.count(K)) return 0;
         Train T=Train_bpp.find(K);
-        if(T.For_sale) return 0;
+        if(!T.station_num||T.For_sale) return 0;
+        /*
+         *把需要删掉的ticket删去
+         */
+        vector<Station> V;
+        Station_link.read_block(T.stblock,V);
+        for(int i=0;i<T.station_num;++i){
+            MyTicket_bpp.remove(myTicketkey(train_id,V[i].loc));
+        }
+        V.clear();
         strcpy(T.name, name);
         strcpy(T.catalog, catalog);
         T.station_num = nums;
         T.price_num = nump;
         Station tmp;
-        vector<Station> V;
         for (int i = 0; i < nump; ++i){
             std::cin >> T.price_name[i];
         }
@@ -654,22 +658,26 @@ namespace sjtu{
             V.push_back(tmp);
         }
         T.stblock=Station_link.push_back(V);
+        T.rblock=add_remain(T.price_num,T.station_num);
         Train_bpp.set(K,T);
         return 1;
     }
 
-
-
-   /*
+    /*
     * 删掉车次
     */
     int terminal::delete_train(const char *tid){
         Trainkey K(tid);
-        if(!Train_bpp.count(K)) return 0;
+        Train T=Train_bpp.find(K);
+        if(!T.station_num||T.For_sale) return 0;
+        vector<Station> V;
+        Station_link.read_block(T.stblock,V);
+        for(int i=0;i<T.station_num;++i){
+               MyTicket_bpp.remove(myTicketkey(tid,V[i].loc));
+        }
         Train_bpp.remove(K);
         return 1;
     }
-
 
 
     int terminal::log_in(const int &id, const char *pass){
@@ -680,6 +688,7 @@ namespace sjtu{
     }
 
 
+
     int terminal::modify_profile(const int &id, const char *name, const char *password, const char *email, const char *phone){
         User U;
         if(!User_list.find(id-FIRSTID,U)) return 0;
@@ -687,7 +696,6 @@ namespace sjtu{
         User_list.modify(id-FIRSTID,U);
         return 1;
     }
-
 
 
     int terminal::modify_privilege(const int &id1, const int &id2, const int &privilege){
@@ -704,7 +712,7 @@ namespace sjtu{
 
     int terminal::query_train(const char *tid){
         Trainkey K(tid);
-        Train T=Train_bpp.find(K,Train());
+        Train T=Train_bpp.find(K);
         if(!T.station_num||!T.For_sale) return 0;
         std::cout << tid << " " << T.name << " " << T.catalog << " " << T.station_num << " " << T.price_num << " ";
         for (int i = 0; i < T.price_num; ++i) {
@@ -738,6 +746,7 @@ namespace sjtu{
         }
         std::cout<<std::endl;
     }
+
 
 
     int terminal::query_ticket(const char *lc1, const char *lc2, const Date &D, const char *cat){
