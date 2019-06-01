@@ -60,7 +60,6 @@ namespace sjtu {
     };
 
 
-
     std::istream& operator>>(std::istream &is,Station& S){
         char tmp[15];
         is>>S.loc>>S.arrive_time>>S.start_time>>S.stop_time;
@@ -70,7 +69,6 @@ namespace sjtu {
         }
         return is;
     }
-
 
 
     struct Trainkey{
@@ -102,105 +100,107 @@ namespace sjtu {
 
 
     struct Train {
-            char name[TRAINNAME];
-            char catalog[CATSIZE];
-            int station_num;
-            //存放Station在文件中存放的位置
-            block stblock;
-            //存放剩余车票数据块
-            block rblock;
-            /*
-             * Whether the train is already forsale or not
-             */
-            bool For_sale;
-            int price_num;
-            char price_name[PRICENUM][PRICESIZE];
-            bool operator==(const Train&rhs){
-                return (strcmp(name,rhs.name)==0);
+        char name[TRAINNAME];
+        char catalog[CATSIZE];
+        int station_num;
+        //存放Station在文件中存放的位置
+        block stblock;
+        //存放剩余车票数据块
+        block rblock;
+        /*
+         * Whether the train is already forsale or not
+         */
+        bool For_sale;
+        int price_num;
+        char price_name[PRICENUM][PRICESIZE];
+        bool operator==(const Train&rhs){
+            return (strcmp(name,rhs.name)==0);
+        }
+        Train& operator=(const Train& rhs){
+            if(&rhs==this) return *this;
+            strcpy(name,rhs.name);
+            strcpy(catalog,rhs.catalog);
+            station_num=rhs.station_num;
+            For_sale=rhs.For_sale;
+            price_num=rhs.price_num;
+            stblock=rhs.stblock;
+            rblock=rhs.rblock;
+            for(int i=0;i<price_num;++i){
+                strcpy(price_name[i],rhs.price_name[i]);
             }
-            Train& operator=(const Train& rhs){
-                if(&rhs==this) return *this;
-                strcpy(name,rhs.name);
-                strcpy(catalog,rhs.catalog);
-                station_num=rhs.station_num;
-                For_sale=rhs.For_sale;
-                price_num=rhs.price_num;
-                stblock=rhs.stblock;
-                rblock=rhs.rblock;
-                for(int i=0;i<price_num;++i){
-                    strcpy(price_name[i],rhs.price_name[i]);
-                }
-                return *this;
+            return *this;
+        }
+        Train(const Train& rhs){
+            strcpy(name,rhs.name);
+            strcpy(catalog,rhs.catalog);
+            station_num=rhs.station_num;
+            For_sale=rhs.For_sale;
+            price_num=rhs.price_num;
+            stblock=rhs.stblock;
+            rblock=rhs.rblock;
+            for(int i=0;i<price_num;++i){
+                strcpy(price_name[i],rhs.price_name[i]);
             }
-            Train(const Train& rhs){
-                strcpy(name,rhs.name);
-                strcpy(catalog,rhs.catalog);
-                station_num=rhs.station_num;
-                For_sale=rhs.For_sale;
-                price_num=rhs.price_num;
-                stblock=rhs.stblock;
-                rblock=rhs.rblock;
-                for(int i=0;i<price_num;++i){
-                    strcpy(price_name[i],rhs.price_name[i]);
-                }
-            }
-            Train(){
-                strcpy(name,"\0");
-                station_num=0;
-                For_sale=false;
-                price_num=0;
-            }
+        }
+        Train(){
+            strcpy(name,"\0");
+            station_num=0;
+            For_sale=false;
+            price_num=0;
+        }
     };
 
 
     struct myTicketkey{
-            char loc[LOCSIZE];
-            char tid[IDSIZE];
-            myTicketkey(const char*id,const char* lc){
-                strcpy(tid,id);
-                strcpy(loc,lc);
-            };
-            myTicketkey& operator=(const myTicketkey& rhs){
-                if(&rhs==this) return *this;
-                strcpy(loc,rhs.loc);
-                strcpy(tid,rhs.tid);
-                return *this;
-            }
-            myTicketkey(const myTicketkey& rhs){
-                strcpy(loc,rhs.loc);
-                strcpy(tid,rhs.tid);
-            }
-            myTicketkey()= default;
+        char loc[LOCSIZE];
+        char tid[IDSIZE];
+        myTicketkey(const char*id,const char* lc){
+            strcpy(tid,id);
+            strcpy(loc,lc);
+        };
+        myTicketkey& operator=(const myTicketkey& rhs){
+            if(&rhs==this) return *this;
+            strcpy(loc,rhs.loc);
+            strcpy(tid,rhs.tid);
+            return *this;
+        }
+        myTicketkey(const myTicketkey& rhs){
+            strcpy(loc,rhs.loc);
+            strcpy(tid,rhs.tid);
+        }
+        myTicketkey()= default;
     };
 
 
 
     struct myTicket{
-            //判断一个Ticket是否是默认构造出的元素
-            bool exist;
-            char catlog[CATSIZE];
-            //存储myTicketkey中的 loc是 train_id的第几站
-            int K;
-            myTicket(const bool& B,const char* cat){
-                exist=B;
-                strcpy(catlog,cat);
-            }
-            myTicket(){
-                exist=false;
-            }
-            myTicket(const myTicket& rhs){
-                exist=rhs.exist;
-                K=rhs.K;
-                strcpy(catlog,rhs.catlog);
-            }
-            myTicket&  operator=(const myTicket& rhs){
-                if(&rhs==this) return *this;
-                strcpy(catlog,rhs.catlog);
-                exist=rhs.exist;
-                K=rhs.K;
-                return *this;
-            }
+        //判断一个Ticket是否是默认构造出的元素
+        bool exist;
+        char catlog[CATSIZE];
+        //存储myTicketkey中的 loc是 train_id的第几站
+        int K;
+        myTicket(const bool& B,const char* cat){
+            exist=B;
+            strcpy(catlog,cat);
+        }
+        myTicket(){
+            exist=false;
+        }
+        myTicket(const myTicket& rhs){
+            exist=rhs.exist;
+            K=rhs.K;
+            strcpy(catlog,rhs.catlog);
+        }
+        myTicket&  operator=(const myTicket& rhs){
+            if(&rhs==this) return *this;
+            strcpy(catlog,rhs.catlog);
+            exist=rhs.exist;
+            K=rhs.K;
+            return *this;
+        }
     };
+
+
     class compare_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
@@ -213,11 +213,15 @@ namespace sjtu {
         }
     };
 
+
+
+
     class search_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
-            if(strcmp(T1.loc,T2.loc)<0) return true;
-            return false;
+            if(strcmp(T1.loc,T2.loc)<0) return false;
+            if(strcmp(T1.loc,T2.loc)>0) return false;
+            return true;
         }
     };
 
@@ -246,31 +250,31 @@ namespace sjtu {
 
 
     struct myOrder{
-         //所购买车票对应的车站位置
-         int x;
-         int y;
-         //所购买车票剩余数量
-         int num[PRICENUM];
-         //所购买车票总数
-         int sum;
-         char catalog[CATSIZE];
-         myOrder(){
-             sum=0;
-             for(int i=0;i<PRICENUM;++i){
-                 num[i]=0;
-             }
-         }
-         myOrder(const myOrder& rhs){
-             sum=rhs.sum;
-             x=rhs.x;
-             y=rhs.y;
-             strcpy(catalog,rhs.catalog);
-             for(int i=0;i<PRICENUM;++i){
-                 num[i]=rhs.num[i];
-             }
-         }
+        //所购买车票对应的车站位置
+        int x;
+        int y;
+        //所购买车票剩余数量
+        int num[PRICENUM];
+        //所购买车票总数
+        int sum;
+        char catalog[CATSIZE];
+        myOrder(){
+            sum=0;
+            for(int i=0;i<PRICENUM;++i){
+                num[i]=0;
+            }
+        }
+        myOrder(const myOrder& rhs){
+            sum=rhs.sum;
+            x=rhs.x;
+            y=rhs.y;
+            strcpy(catalog,rhs.catalog);
+            for(int i=0;i<PRICENUM;++i){
+                num[i]=rhs.num[i];
+            }
+        }
         myOrder& operator=(const myOrder& rhs){
-             if(this==&rhs) return *this;
+            if(this==&rhs) return *this;
             sum=rhs.sum;
             x=rhs.x;
             y=rhs.y;
@@ -285,27 +289,49 @@ namespace sjtu {
      * The ticket information to be stored in User bptree;
      */
     struct Orderkey{
-            int Uid;
-            Date D;
-            char train_id[IDSIZE];
-            Orderkey(const int&id,const Date& d,const char*tid){
-                Uid=id;D=d;
-                strcpy(train_id,tid);
-            }
-            Orderkey()= default;
-            Orderkey& operator=(const Orderkey& rhs){
-                if(&rhs==this) return *this;
-                Uid=rhs.Uid;
-                D=rhs.D;
-                strcpy(train_id,rhs.train_id);
-                return *this;
-            }
-            Orderkey(const Orderkey& rhs){
-                Uid=rhs.Uid;
-                D=rhs.D;
-                strcpy(train_id,rhs.train_id);
-            }
+        int Uid;
+        Date D;
+        char train_id[IDSIZE];
+        Orderkey(const int&id,const Date& d,const char*tid){
+            Uid=id;D=d;
+            strcpy(train_id,tid);
+        }
+        Orderkey()= default;
+        Orderkey& operator=(const Orderkey& rhs){
+            if(&rhs==this) return *this;
+            Uid=rhs.Uid;
+            D=rhs.D;
+            strcpy(train_id,rhs.train_id);
+            return *this;
+        }
+        Orderkey(const Orderkey& rhs){
+            Uid=rhs.Uid;
+            D=rhs.D;
+            strcpy(train_id,rhs.train_id);
+        }
     };
+
+
+
+    class search_myorder{
+    public:
+        bool operator () (const myOrderkey& T1,const myOrderkey& T2) const {
+            {
+                if(T1.Uid<T2.Uid) return false;
+                if(T1.Uid>T2.Uid) return false;
+                if(T1.D<T2.D) return false;
+                if(T1.D>T2.D) return false;
+                return true;
+            }
+        }
+    };
+
+
+
+
+
+
+
     class compare_myorder{
     public:
         bool operator () (const myOrderkey& T1,const myOrderkey& T2) const {
@@ -321,7 +347,6 @@ namespace sjtu {
             }
         }
     };
-
     /*
      * The function print the information of a single station.
      */
@@ -339,13 +364,42 @@ namespace sjtu {
 
 
 
+    bool operator<=(const Trainkey &T1,const Trainkey &T2){
+        return !(T2<T1);
+    }
+
+
+    bool operator==(const Trainkey &T1,const Trainkey &T2){
+        return (strcmp(T1.train_id,T2.train_id)==0);
+    }
+
+
+    bool operator!=(const Trainkey &T1,const Trainkey &T2){
+        return !(T1==T2);
+    }
+
+
     bool operator<(const myTicketkey &T1,const myTicketkey &T2){
         if(strcmp(T1.loc,T2.loc)<0) return true;
         if(strcmp(T1.loc,T2.loc)>0) return false;
-        if(strcmp(T1.tid,"\0")!=0&&strcmp(T2.tid,"\0")!=0){
-            if(strcmp(T1.tid,T2.tid)<0) return true;
-        }
+        if(strcmp(T1.tid,T2.tid)<0) return true;
         return false;
+    }
+
+
+    bool operator<=(const myTicketkey &T1,const myTicketkey &T2){
+        return !(T2<T1);
+    }
+
+
+
+    bool operator==(const myTicketkey &T1,const myTicketkey &T2){
+        return (strcmp(T1.loc,T2.loc)==0&&strcmp(T1.tid,T2.tid)==0);
+    }
+
+
+    bool operator!=(const myTicketkey &T1,const myTicketkey &T2){
+        return !(T1==T2);
     }
 
 
@@ -354,11 +408,29 @@ namespace sjtu {
         if(T1.Uid>T2.Uid) return false;
         if(T1.D<T2.D) return true;
         if(T1.D>T2.D) return false;
-        if(strcmp(T1.train_id,"\0")!=0&&strcmp(T2.train_id,"\0")!=0){
-            if(strcmp(T1.train_id,T2.train_id)<0) return true;
-        }
+        if(strcmp(T1.train_id,T2.train_id)<0) return true;
         return false;
     }
+
+
+
+
+
+    bool operator<=(const myOrderkey &T1,const myOrderkey &T2){
+        return !(T2<T1);
+    }
+
+
+    bool operator==(const myOrderkey &T1,const myOrderkey &T2){
+        return(T1.Uid==T2.Uid)&&(T1.D==T2.D)&&(strcmp(T1.train_id,T2.train_id)==0);
+    }
+
+
+    bool operator!=(const myOrderkey &T1,const myOrderkey &T2){
+        return !(T1==T2);
+    }
+
+
 
 
 
