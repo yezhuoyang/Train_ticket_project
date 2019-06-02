@@ -19,7 +19,7 @@
 #define NAMESIZE 16
 //用户email大小
 //火车名字大小
-#define TRAINNAME 16
+#define TRAINNAME 24
 
 #define  EMAILSIZE 18
 //用户电话号码大小
