@@ -41,7 +41,7 @@
 #define  FILENAME 100
 
 //用户缓存区大小
-#define  UBSIZE 60
+#define  UBSIZE 100
 
 //车站缓存区大小
 #define  STBSIZE 300
