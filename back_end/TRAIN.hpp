@@ -22,11 +22,9 @@ namespace sjtu {
         num = num * pow(10, -(pos - dig - 1));
         return num;
     }
-
-
-
     struct Station{
         char loc[LOCSIZE];
+        int  remain[30][PRICENUM];
         //某站出发的车票和第一站出发的车票隔的天数
         int  ad;
         Time arrive_time,start_time,stop_time;
@@ -41,6 +39,9 @@ namespace sjtu {
             ad=rhs.ad;
             for(int i=0;i<type_num;++i){
                 price[i]=rhs.price[i];
+                for(int j=0;j<30;++j){
+                    remain[j][i]=rhs.remain[j][i];
+                }
             }
             strcpy(loc,rhs.loc);
             return *this;
@@ -53,10 +54,22 @@ namespace sjtu {
             type_num=rhs.type_num;
             for(int i=0;i<type_num;++i){
                 price[i]=rhs.price[i];
+                for(int j=0;j<30;++j){
+                    remain[j][i]=rhs.remain[j][i];
+                }
             }
             strcpy(loc,rhs.loc);
         }
-        Station(){type_num=0;ad=0;}
+        Station(){
+            type_num=0;ad=0;
+        }
+        void add_ticket(){
+            for(int i=0;i<type_num;++i){
+                for(int j=0;j<30;++j){
+                    remain[j][i]=2000;
+                }
+            }
+        }
     };
 
 
@@ -67,6 +80,7 @@ namespace sjtu {
             is>>tmp;
             S.price[i]=transform_to_double(tmp);
         }
+        S.add_ticket();
         return is;
     }
 
@@ -105,8 +119,6 @@ namespace sjtu {
         int station_num;
         //存放Station在文件中存放的位置
         block stblock;
-        //存放剩余车票数据块
-        block rblock;
         /*
          * Whether the train is already forsale or not
          */
@@ -124,7 +136,6 @@ namespace sjtu {
             For_sale=rhs.For_sale;
             price_num=rhs.price_num;
             stblock=rhs.stblock;
-            rblock=rhs.rblock;
             for(int i=0;i<price_num;++i){
                 strcpy(price_name[i],rhs.price_name[i]);
             }
@@ -137,7 +148,6 @@ namespace sjtu {
             For_sale=rhs.For_sale;
             price_num=rhs.price_num;
             stblock=rhs.stblock;
-            rblock=rhs.rblock;
             for(int i=0;i<price_num;++i){
                 strcpy(price_name[i],rhs.price_name[i]);
             }
@@ -411,8 +421,6 @@ namespace sjtu {
         if(strcmp(T1.train_id,T2.train_id)<0) return true;
         return false;
     }
-
-
 
 
 

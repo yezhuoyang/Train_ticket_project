@@ -7,9 +7,6 @@
 #include <iostream>
 #include "stdio.h"
 #include "constant.h"
-
-
-
 namespace  sjtu {
     /*
      * The function convert hour ab and minute cd to string "ab:cd"
@@ -22,15 +19,12 @@ namespace  sjtu {
         list[3]='0'+minute/10;
         list[5]='\0';
     }
-
     /*
      * The function convert the string of date "XXXX:XX:ab" to an integer  ab-1
      */
     int date_to_int(const char list[]){
         return 10*(list[8]-'0')+(list[9]-'1');
     }
-
-
     struct Date {
         char date[13];
         /*
@@ -53,6 +47,7 @@ namespace  sjtu {
            tmp.pos+=k;
            return tmp;
     }
+
 
 
 //时间类

@@ -108,8 +108,6 @@ namespace sjtu{
             fflush(F);
         }
     };
-
-
     template<class value>
     class list{
     private:

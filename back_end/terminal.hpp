@@ -25,7 +25,6 @@ namespace sjtu{
         bptree<myTicketkey,myTicket> MyTicket_bpp;
         bptree<myOrderkey,myOrder> MyOrder_bpp;
         link<Station> Station_link;
-        link<int>     remain_link;
         int current_id;
         char input[20];
         int  id;
@@ -73,36 +72,19 @@ namespace sjtu{
         };
         type currenttype;
 
-
-        int remain_value(const sjtu::vector<int>& V,const int&d,const int &N,const int& P,const int& n,const int& x,const int &y){
-            int R=d*N*(P-1)+n*(P-1);
+        int remain_value(const sjtu::vector<Station>& V,const int&d,const int& n,const int& x,const int &y){
             if(y==x+1){
-                return V[R+x];
+                return V[x].remain[d][n];
             }
             int result=1e9;
             for(int i=x;i<y;++i){
-                result=result<V[R+i]?result:V[R+i];
+                result=result<V[i].remain[d][n]?result:V[i].remain[d][n];
             }
             return result;
         }
-
-
-        block add_remain(const int&N,const int& k){
-            vector<int> V;
-            for(int j=0;j<30;++j){
-                for(int p=0;p<N;++p){
-                    for(int i=0;i<k-1;++i){
-                        V.push_back(2000);
-                    }
-                }
-            }
-            return remain_link.push_back(V);
-        }
-
-        void del_remain(vector<int>& V,const int&d,const int& K,const int&k,const int& P, const int& x,const int& y,const int& num){
-            int R = d*K*(P-1)+k*(P-1);
+        void del_remain(sjtu::vector<Station>& V,const int&d,const int& n,const int& x,const int &y,const int& num){
             for(int i=x;i<y;++i){
-                V[R + i] -= num;
+                V[i].remain[d][n]-= num;
             }
         }
         int Register(const char *name, const char *pass, const char *email, const char *phone);
@@ -135,17 +117,15 @@ namespace sjtu{
 
         int modify_train(const char*train_id,const char* name,const char* catalog,const int&nums,const int& nump);
 
-
-        void print_ticket(const char* tid,const  sjtu::vector<Station>& ST,const Train& T,const sjtu::vector<int>& RM,const Date& d,const int&x,const int&y);
-
+        void print_ticket(const char* tid,const  sjtu::vector<Station>& ST,const Train& T,const Date& d,const int&x,const int&y);
 
         /*
-   * 返回x-y车站剩余车票数
-   */
+         * 返回x-y车站剩余车票数
+         */
     public:
         terminal(const char* uf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
-                 const char* stationfile,const char* remainfile):User_list(uf,UBSIZE),Train_bpp(Tf),MyOrder_bpp(of),MyTicket_bpp(tf),
-                                                                 Station_link(stationfile,STBSIZE),remain_link(remainfile,REMAINSIZE){
+                 const char* stationfile):User_list(uf,UBSIZE),Train_bpp(Tf),MyOrder_bpp(of),MyTicket_bpp(tf),
+                                          Station_link(stationfile,STBSIZE){
             strcpy(Trainfile,Tf);
             strcpy(Trainidfile,Tfid);
             strcpy(myOrderfile,of);
@@ -163,7 +143,6 @@ namespace sjtu{
             MyOrder_bpp.init();
             MyTicket_bpp.init();
             Station_link.clear();
-            remain_link.clear();
         }
         int execute(){
             strcpy(input,"\0");
@@ -379,12 +358,8 @@ namespace sjtu{
         /*
          * 从文件中读取剩余车票信息
          */
-        sjtu::vector<int> R1;
-        sjtu::vector<int> R2;
         Station_link.read_block(T1list[x].stblock,ST1);
         Station_link.read_block(T2list[y].stblock,ST2);
-        remain_link.read_block(T1list[x].rblock,R1);
-        remain_link.read_block(T2list[y].rblock,R2);
         /*
          * 计算票价信息
          */
@@ -408,19 +383,17 @@ namespace sjtu{
         std::cout<<V1[x].first.tid<<" "<<ST1[V1[x].second.K].loc<<" "<<D+ST1[V1[x].second.K].ad<<" "<<ST1[V1[x].second.K].start_time<<" ";
         std::cout<<ST1[k1].loc<<" "<<D+ST1[k1].ad<<" "<<ST1[k1].arrive_time<<" ";
         for(int i=0;i<T1list[x].price_num;++i){
-            std::cout<<T1list[x].price_name[i]<<" "<<remain_value(R1,D.pos,T1list[x].price_num,T1list[x].station_num,i,V1[x].second.K,k1)<<" "<<P1[i]<<" ";
+            std::cout<<T1list[x].price_name[i]<<" "<<remain_value(ST1,D.pos,i,V1[x].second.K,k1)<<" "<<P1[i]<<" ";
         }
         std::cout<<std::endl;
         std::cout<<V2[y].first.tid<<" "<<ST2[k2].loc<<" "<<D+ST2[k2].ad<<" "<<ST2[k2].start_time<<" ";
         std::cout<<ST2[V2[y].second.K].loc<<" "<<D+ST2[V2[y].second.K].ad<<" "<<ST2[V2[y].second.K].arrive_time<<" ";
         for(int i=0;i<T2list[y].price_num;++i){
-            std::cout<<T2list[y].price_name[i]<<" "<<remain_value(R2,D.pos,T2list[y].price_num,T2list[y].station_num,i,k2,V2[y].second.K)<<" "<<P2[i]<<" ";
+            std::cout<<T2list[y].price_name[i]<<" "<<remain_value(ST2,D.pos,i,k2,V2[y].second.K)<<" "<<P2[i]<<" ";
         }
         std::cout<<std::endl;
         return 1;
     }
-
-
     int terminal::query_profile(const int &id){
         User U;
         if (!User_list.find(id-FIRSTID,U)) return 0;
@@ -486,9 +459,6 @@ namespace sjtu{
         while(k<T.price_num&&strcmp(T.price_name[k],ticket_kind)!=0) ++k;
         if(k==T.price_num) return 0;
 
-
-
-
         /*
         * 读入车站的信息
         */
@@ -506,14 +476,13 @@ namespace sjtu{
         /*
          * 读入剩余车票的信息
          */
-        sjtu::vector<int> V1;
-        remain_link.read_block(T.rblock,V1);
-        if(remain_value(V1,date.pos,T.price_num,T.station_num,k,x,y)<num) return 0;
+
+        if(remain_value(V,date.pos,k,x,y)<num) return 0;
         /*
          * 减去相应的剩余车票
          */
-        del_remain(V1,date.pos,T.price_num,k,T.station_num,x,y,num);
-        remain_link.modify(T.rblock,V1);
+        del_remain(V,date.pos,k,x,y,num);
+        Station_link.modify(T.stblock,V);
         myOrderkey ok(id,date,train_id);
         myOrder O=MyOrder_bpp.find(ok);
         if(O.sum==0){
@@ -558,10 +527,8 @@ namespace sjtu{
             if(strcmp(V[i].loc,loc2)==0) y=i;
         }
         if(x==-1||y==-1) return 0;
-        sjtu::vector<int> V1;
-        remain_link.read_block(T.rblock,V1);
-        del_remain(V1,date.pos,T.price_num,k,T.station_num,x,y,-num);
-        remain_link.modify(T.rblock,V1);
+        del_remain(V,date.pos,k,x,y,-num);
+        Station_link.modify(T.stblock,V);
         //如果这个order买的总票数为0了，就删掉
         if(!mO.sum) MyOrder_bpp.remove(okey);
         else{
@@ -602,7 +569,6 @@ namespace sjtu{
             V.push_back(tmp);
         }
         T.stblock=Station_link.push_back(V);
-        T.rblock=add_remain(T.price_num,T.station_num);
         myTicket mT(true,T.catalog);
         /*
          * 所有经过某站点loc的信息都要存到 MyTicket_bpp中去
@@ -621,7 +587,6 @@ namespace sjtu{
         Train_bpp.insert(K,T);
         return 1;
     }
-
 
 
 
@@ -661,7 +626,6 @@ namespace sjtu{
             V.push_back(tmp);
         }
         T.stblock=Station_link.push_back(V);
-        T.rblock=add_remain(T.price_num,T.station_num);
         myTicket mT(true,T.catalog);
         /*
          * 所有经过某站点loc的信息都要存到 MyTicket_bpp中去
@@ -688,7 +652,6 @@ namespace sjtu{
         if(!T.station_num||T.For_sale) {return 0;}
         vector<Station> V;
         Station_link.read_block(T.stblock,V);
-
         for(int i=0;i<T.station_num;++i){
             MyTicket_bpp.remove(myTicketkey(tid,V[i].loc));
         }
@@ -746,7 +709,7 @@ namespace sjtu{
     }
 
 
-    void terminal::print_ticket(const char* tid,const  sjtu::vector<Station>& ST,const Train& T,const sjtu::vector<int>& RM,const Date& d,const int&x,const int&y){
+    void terminal::print_ticket(const char* tid,const  sjtu::vector<Station>& ST,const Train& T,const Date& d,const int&x,const int&y){
         std::cout<<tid<<" "<<ST[x].loc<<" "<<d+ST[x].ad<<" "<<ST[x].start_time<<" ";
         std::cout<<ST[y].loc<<" "<<d+ST[y].ad<<" "<<ST[y].arrive_time<<" ";
         /*
@@ -760,10 +723,12 @@ namespace sjtu{
             }
         }
         for(int i=0;i<T.price_num;++i){
-            std::cout<<T.price_name[i]<<" "<<remain_value(RM,d.pos,T.price_num,T.station_num,i,x,y)<<" "<<P[i]<<" ";
+            std::cout<<T.price_name[i]<<" "<<remain_value(ST,d.pos,i,x,y)<<" "<<P[i]<<" ";
         }
         std::cout<<std::endl;
     }
+
+
 
 
     int terminal::query_ticket(const char *lc1, const char *lc2, const Date &D, const char *cat){
@@ -803,15 +768,12 @@ namespace sjtu{
         if(F.empty()) return 0;
         std::cout<<F.size()<<std::endl;
         sjtu::vector<Station> ST;
-        sjtu::vector<int> RM;
         Train T;
         for(int i=0;i<F.size();++i){
             ST.clear();
-            RM.clear();
             T=Train_bpp.find(F[i]);
             Station_link.read_block(T.stblock,ST);
-            remain_link.read_block(T.rblock,RM);
-            print_ticket(F[i].train_id,ST,T,RM,D,P[i].first,P[i].second);
+            print_ticket(F[i].train_id,ST,T,D,P[i].first,P[i].second);
         }
         return 1;
     }
