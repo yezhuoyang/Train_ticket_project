@@ -287,7 +287,7 @@ namespace sjtu{
         void read_block(const myblock&B,sjtu::vector<value1>& V1,sjtu::vector<value2> &V2){
             flushbuffer();
             fseek(F,B.pos,SEEK_SET);
-            char * tmp=new char[V1.size()*bs1+V2.size()*bs2+1];
+            char * tmp=new char[B.S1*bs1+B.S2*bs2+1];
             fread(tmp,1,B.S1*bs1+B.S2*bs2,F);
             memcpy(buffer1,tmp,B.S1*bs1);
             memcpy(buffer2,tmp+B.S1*bs1,B.S2*bs2);
