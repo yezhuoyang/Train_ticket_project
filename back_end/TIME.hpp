@@ -27,7 +27,7 @@ namespace  sjtu {
          * Store a date as an integer.
          * 0 denotes 2019-06-01
          */
-        int  pos;
+        short pos;
         Date(){pos=0;}
         Date(const char*D){
             pos=date_to_int(D);
@@ -45,8 +45,8 @@ namespace  sjtu {
     }
 //时间类
     struct Time {
-        int hour;
-        int minute;
+        short hour;
+        short minute;
         Time(const char* T){
             char tmp[6];
             strcpy(tmp,T);

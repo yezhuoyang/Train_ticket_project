@@ -25,10 +25,10 @@ namespace sjtu {
     struct Station{
         char loc[LOCSIZE];
         //某站出发的车票和第一站出发的车票隔的天数
-        int  ad;
+        short  ad;
         Time arrive_time,start_time,stop_time;
         double price[5];
-        int type_num;
+        short type_num;
         Station& operator=(const Station& rhs){
             if(&rhs==this) return *this;
             arrive_time=rhs.arrive_time;
@@ -58,7 +58,6 @@ namespace sjtu {
         }
     };
 
-
     std::istream& operator>>(std::istream &is,Station& S){
         char tmp[15];
         is>>S.loc>>S.arrive_time>>S.start_time>>S.stop_time;
@@ -68,8 +67,6 @@ namespace sjtu {
         }
         return is;
     }
-
-
     struct Trainkey{
         char train_id[IDSIZE];
         Trainkey(const char*tid){
@@ -85,25 +82,23 @@ namespace sjtu {
         }
         Trainkey()= default;
     };
-
     class compare_train{
     public:
         bool operator () (const Trainkey& T1,const Trainkey& T2) const {
             return strcmp(T1.train_id,T2.train_id)<0;
         }
     };
-
     struct Train {
         char name[TRAINNAME];
         char catalog[CATSIZE];
-        int station_num;
+        short station_num;
         //存放Station在文件中存放的位置
         myblock stblock;
         /*
          * Whether the train is already forsale or not
          */
         bool For_sale;
-        int price_num;
+        short price_num;
         char price_name[PRICENUM][PRICESIZE];
         bool operator==(const Train&rhs){
             return (strcmp(name,rhs.name)==0);
@@ -168,7 +163,7 @@ namespace sjtu {
         bool exist;
         char catlog[CATSIZE];
         //存储myTicketkey中的 loc是 train_id的第几站
-        int K;
+        short K;
         myTicket(const bool& B,const char* cat){
             exist=B;
             strcpy(catlog,cat);
@@ -216,7 +211,7 @@ namespace sjtu {
     };
 
     struct myOrderkey{
-        int Uid;
+        short  Uid;
         Date D;
         char train_id[IDSIZE];
         myOrderkey(const int&id,const Date& d,const char*tid){
@@ -241,12 +236,12 @@ namespace sjtu {
 
     struct myOrder{
         //所购买车票对应的车站位置
-        int x;
-        int y;
+        short x;
+        short y;
         //所购买车票剩余数量
-        int num[PRICENUM];
+        short num[PRICENUM];
         //所购买车票总数
-        int sum;
+        short sum;
         char catalog[CATSIZE];
         myOrder(){
             sum=0;
@@ -280,7 +275,7 @@ namespace sjtu {
      * The ticket information to be stored in User bptree;
      */
     struct Orderkey{
-        int Uid;
+        short Uid;
         Date D;
         char train_id[IDSIZE];
         Orderkey(const int&id,const Date& d,const char*tid){
