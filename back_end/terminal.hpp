@@ -509,8 +509,6 @@ namespace sjtu{
         return 1;
     }
 
-
-
     int terminal::refund_ticket(const int& id,const int& num,const char* train_id,const char* loc1,const char* loc2,const Date& date,const char* ticket_kind){
         myOrderkey okey(id,date,train_id);
         myOrder mO=MyOrder_bpp.find(okey);
@@ -546,8 +544,6 @@ namespace sjtu{
         }
         return 1;
     }
-
-
 
     int terminal::add_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
@@ -605,8 +601,6 @@ namespace sjtu{
         Train_bpp.insert(K,T);
         return 1;
     }
-
-
 
     int terminal::modify_train(const char *train_id, const char *name, const char *catalog, const int &nums, const int &nump){
         Trainkey K(train_id);
