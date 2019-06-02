@@ -193,8 +193,6 @@ namespace sjtu {
             return *this;
         }
     };
-
-
     class compare_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
@@ -206,10 +204,6 @@ namespace sjtu {
             return false;
         }
     };
-
-
-
-
     class search_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
@@ -218,7 +212,6 @@ namespace sjtu {
             return true;
         }
     };
-
     struct myOrderkey{
         int Uid;
         Date D;
@@ -241,8 +234,6 @@ namespace sjtu {
             strcpy(train_id,rhs.train_id);
         }
     };
-
-
     struct myOrder{
         //所购买车票对应的车站位置
         int x;

@@ -6,6 +6,7 @@
 #include "../back_end/terminal.hpp"
 using namespace sjtu;
 int main(){
+
     //char r_path[100]="/Users/yezhuoyang/Desktop/Train_ticket_project/data/";
     char r_path[100]="./";
     char User_file[100];
@@ -37,6 +38,8 @@ int main(){
     while(c){
         c=T.execute();
     }
+
+
 
 }
 
