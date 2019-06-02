@@ -21,7 +21,7 @@
 //火车名字大小
 #define TRAINNAME 24
 
-#define  EMAILSIZE 18
+#define  EMAILSIZE 20
 //用户电话号码大小
 #define  PHONESIZE 12
 //用户密码大小
