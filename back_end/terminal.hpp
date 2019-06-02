@@ -30,7 +30,7 @@ namespace sjtu{
         int  id;
         int  num;
         int id1,id2;
-        int  privilege;
+        char  privilege;
         char name[NAMESIZE];
         char password[PASSSIZE];
         char phone[PHONESIZE];
@@ -96,7 +96,7 @@ namespace sjtu{
 
         int modify_profile(const int&id,const char* name,const char* password,const char* email,const char* phone);
 
-        int modify_privilege(const int& id1,const int& id2,const int&privilege);
+        int modify_privilege(const int& id1,const int& id2,const char&privilege);
 
         int query_ticket(const char* loc1,const char*loc2,const Date& date,const char* catalog);
 
@@ -269,8 +269,8 @@ namespace sjtu{
     int terminal::Register(const char *name, const char *pass, const char *email, const char *phone){
         User U;
         U.modify(name, pass, email, phone);
-        U.privilege = 1;
-        if (current_id == FIRSTID) U.privilege = 2;
+        U.privilege = '1';
+        if (current_id == FIRSTID) U.privilege = '2';
         //读取失败！
         User_list.push_back(U);
         ++current_id;
@@ -493,6 +493,14 @@ namespace sjtu{
         del_remain(V1,date.pos,T.price_num,k,T.station_num,x,y,num);
         Station_link.modify(T.stblock,V1);
         myOrderkey ok(id,date,train_id);
+        myOrder O;
+        O.x=x;O.y=y;
+        O.sum=num;
+        O.num[k]=num;
+        strcpy(O.catalog,T.catalog);
+        MyOrder_bpp.insert(ok, O);
+        return 1;
+        /*
         myOrder O=MyOrder_bpp.find(ok);
         if(O.sum==0){
             O.x=x;O.y=y;
@@ -507,6 +515,7 @@ namespace sjtu{
             MyOrder_bpp.set(ok,O);
         }
         return 1;
+         */
     }
 
     int terminal::refund_ticket(const int& id,const int& num,const char* train_id,const char* loc1,const char* loc2,const Date& date,const char* ticket_kind){
@@ -702,12 +711,12 @@ namespace sjtu{
 
 
 
-    int terminal::modify_privilege(const int &id1, const int &id2, const int &privilege){
+    int terminal::modify_privilege(const int &id1, const int &id2, const char &privilege){
         User U1, U2;
         if (!User_list.find(id1-FIRSTID,U1)) return 0;
         if(!User_list.find(id2-FIRSTID,U2)) return 0;
-        if (U1.privilege < 2) return 0;
-        if (U2.privilege == 2&&privilege<2) return 0;
+        if (U1.privilege < '2') return 0;
+        if (U2.privilege == '2'&&privilege<'2') return 0;
         U2.privilege = privilege;
         User_list.modify(id2-FIRSTID,U2);
         return 1;
