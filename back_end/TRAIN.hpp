@@ -156,8 +156,6 @@ namespace sjtu {
         myTicketkey()= default;
     };
 
-
-
     struct myTicket{
         //判断一个Ticket是否是默认构造出的元素
         bool exist;
@@ -185,7 +183,6 @@ namespace sjtu {
         }
     };
 
-
     class compare_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
@@ -197,8 +194,6 @@ namespace sjtu {
             return false;
         }
     };
-
-
 
 
     class search_myticket{
@@ -232,41 +227,32 @@ namespace sjtu {
             strcpy(train_id,rhs.train_id);
         }
     };
-
-
     struct myOrder{
         //所购买车票对应的车站位置
         short x;
         short y;
         //所购买车票剩余数量
-        short num[PRICENUM];
-        //所购买车票总数
-        short sum;
+        short num;
+        short K;
         char catalog[CATSIZE];
         myOrder(){
-            sum=0;
-            for(int i=0;i<PRICENUM;++i){
-                num[i]=0;
-            }
+            num=0;
+            K=0;
         }
         myOrder(const myOrder& rhs){
-            sum=rhs.sum;
             x=rhs.x;
             y=rhs.y;
             strcpy(catalog,rhs.catalog);
-            for(int i=0;i<PRICENUM;++i){
-                num[i]=rhs.num[i];
-            }
+            num=rhs.num;
+            K=rhs.K;
         }
         myOrder& operator=(const myOrder& rhs){
             if(this==&rhs) return *this;
-            sum=rhs.sum;
             x=rhs.x;
             y=rhs.y;
             strcpy(catalog,rhs.catalog);
-            for(int i=0;i<PRICENUM;++i){
-                num[i]=rhs.num[i];
-            }
+            num=rhs.num;
+            K=rhs.K;
             return *this;
         }
     };
@@ -311,10 +297,6 @@ namespace sjtu {
             }
         }
     };
-
-
-
-
 
 
 

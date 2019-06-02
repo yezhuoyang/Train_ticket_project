@@ -399,8 +399,6 @@ namespace sjtu{
         std::cout<<std::endl;
         return 1;
     }
-
-
     int terminal::query_profile(const int &id){
         User U;
         if (!User_list.find(id-FIRSTID,U)) return 0;
@@ -450,7 +448,12 @@ namespace sjtu{
             std::cout<<Vfound[i].first.train_id<<" "<<ST[Vfound[i].second.x].loc<<" "<<date+ST[Vfound[i].second.x].ad<<" "<<ST[Vfound[i].second.x].start_time<<" ";
             std::cout<<ST[Vfound[i].second.y].loc<<" "<<date+ST[Vfound[i].second.y].ad<<" "<<ST[Vfound[i].second.y].arrive_time<<" ";
             for(int j=0;j<T.price_num;++j){
-                std::cout<<T.price_name[j]<<" "<<Vfound[i].second.num[j]<<" "<<P[j]<<" ";
+                if(j==Vfound[i].second.K){
+                    std::cout<<T.price_name[j]<<" "<<Vfound[i].second.num<<" "<<P[j]<<" ";
+                }
+                else{
+                    std::cout<<T.price_name[j]<<" "<<0<<" "<<P[j]<<" ";
+                }
             }
             std::cout<<std::endl;
         }
@@ -495,8 +498,8 @@ namespace sjtu{
         myOrderkey ok(id,date,train_id);
         myOrder O;
         O.x=x;O.y=y;
-        O.sum=num;
-        O.num[k]=num;
+        O.num=num;
+        O.K=k;
         strcpy(O.catalog,T.catalog);
         MyOrder_bpp.insert(ok, O);
         return 1;
@@ -521,7 +524,7 @@ namespace sjtu{
     int terminal::refund_ticket(const int& id,const int& num,const char* train_id,const char* loc1,const char* loc2,const Date& date,const char* ticket_kind){
         myOrderkey okey(id,date,train_id);
         myOrder mO=MyOrder_bpp.find(okey);
-        if(!mO.sum) {
+        if(!mO.num) {
             return 0;
         }
         Train T=Train_bpp.find(Trainkey(train_id));
@@ -531,9 +534,8 @@ namespace sjtu{
         //确定是哪种票
         int k=0;
         while(k<T.price_num&&strcmp(T.price_name[k],ticket_kind)!=0) ++k;
-        if(k==T.price_num||mO.num[k]<num) return 0;
-        mO.num[k]-=num;
-        mO.sum-=num;
+        if(k==T.price_num||mO.K!=k||mO.num<num) return 0;
+        mO.num-=num;
         sjtu::vector<Station> V;
         sjtu::vector<short> V1;
         Station_link.read_block(T.stblock,V1,V);
@@ -547,7 +549,7 @@ namespace sjtu{
         del_remain(V1,date.pos,T.price_num,k,T.station_num,x,y,-num);
         Station_link.modify(T.stblock,V1);
         //如果这个order买的总票数为0了，就删掉
-        if(!mO.sum) MyOrder_bpp.remove(okey);
+        if(!mO.num) MyOrder_bpp.remove(okey);
         else{
             MyOrder_bpp.set(okey,mO);
         }

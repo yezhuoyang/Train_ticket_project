@@ -203,10 +203,6 @@ namespace sjtu{
 
 
 
-
-
-
-
     template<class value1,class value2>
     class mylink{
     private:
