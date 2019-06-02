@@ -71,8 +71,6 @@ namespace sjtu {
             }
         }
     };
-
-
     std::istream& operator>>(std::istream &is,Station& S){
         char tmp[15];
         is>>S.loc>>S.arrive_time>>S.start_time>>S.stop_time;
@@ -83,8 +81,6 @@ namespace sjtu {
         S.add_ticket();
         return is;
     }
-
-
     struct Trainkey{
         char train_id[IDSIZE];
         Trainkey(const char*tid){
@@ -100,19 +96,12 @@ namespace sjtu {
         }
         Trainkey()= default;
     };
-
-
-
-
     class compare_train{
     public:
         bool operator () (const Trainkey& T1,const Trainkey& T2) const {
             return strcmp(T1.train_id,T2.train_id)<0;
         }
     };
-
-
-
     struct Train {
         char name[TRAINNAME];
         char catalog[CATSIZE];
@@ -159,8 +148,6 @@ namespace sjtu {
             price_num=0;
         }
     };
-
-
     struct myTicketkey{
         char loc[LOCSIZE];
         char tid[IDSIZE];
@@ -180,9 +167,6 @@ namespace sjtu {
         }
         myTicketkey()= default;
     };
-
-
-
     struct myTicket{
         //判断一个Ticket是否是默认构造出的元素
         bool exist;
