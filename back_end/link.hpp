@@ -108,7 +108,6 @@ namespace sjtu{
             fflush(F);
         }
     };
-
     template<class value>
     class list{
     private:
@@ -138,7 +137,6 @@ namespace sjtu{
             flushbuffer();
             fclose(F);
         }
-
         int Size(){
             return Sz;
         }
@@ -167,7 +165,6 @@ namespace sjtu{
             fflush(F);
             return 1;
         }
-
         int find(const int&pos,value &V){
             if(pos>=Sz) return 0;
             if(pos>=bufpos){
@@ -188,6 +185,61 @@ namespace sjtu{
     };
 
 
+    template<class value>
+    class mylist{
+    private:
+        char  filename[FILENAME];
+        FILE* F;
+        int Sz;
+        const size_t blocksize;
+        value* buffer;
+    public:
+        mylist(const char* FN):blocksize(sizeof(value)){
+            strcpy(filename,FN);
+            F=fopen(filename,"rb+");
+            if(F==NULL){
+                F=fopen(filename,"wb+");
+            }
+            buffer=new value[100000];
+            fseek(F,0,SEEK_END);
+            Sz=ftell(F)/blocksize;
+            fseek(F,0,SEEK_SET);
+            fread(buffer,blocksize,Sz,F);
+        }
+        ~mylist(){
+            flushbuffer();
+            delete [] buffer;
+            fclose(F);
+        }
+        int Size(){
+            return Sz;
+        }
+        void clear(){
+            freopen(filename,"wb+",F);
+            Sz=0;
+        }
+        int push_back(const value& V){
+            buffer[Sz++]=V;
+            return 1;
+        }
+        int modify(const int&pos,const value& V){
+            if(pos>=Sz) return 0;
+            buffer[pos]=V;
+            return 1;
+        }
+        int find(const int&pos,value &V){
+            if(pos>=Sz) return 0;
+            V=buffer[pos];
+            return 1;
+        }
+        void flushbuffer(){
+            fseek(F,0,SEEK_SET);
+            fwrite(buffer,blocksize,Sz,F);
+            fflush(F);
+        }
+    };
+
+
     struct myblock{
         size_t  pos;
         size_t  S1;
@@ -198,10 +250,6 @@ namespace sjtu{
             S2=s2;
         }
     };
-
-
-
-
 
     template<class value1,class value2>
     class mylink{

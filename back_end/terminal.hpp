@@ -20,7 +20,7 @@ namespace sjtu{
         std::cout<<Okey.train_id<<" "<<Okey.Uid<<" "<<Okey.D<<" "<<O.catalog<<" "<<O.x<<" "<<O.y<<std::endl;
     }
     class terminal{
-        list<User>  User_list;
+        mylist<User>  User_list;
         bptree<Trainkey,Train> Train_bpp;
         bptree<myTicketkey,myTicket> MyTicket_bpp;
         bptree<myOrderkey,myOrder> MyOrder_bpp;
@@ -127,7 +127,7 @@ namespace sjtu{
    */
     public:
         terminal(const char* uf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
-                 const char* stationfile):User_list(uf,UBSIZE),Train_bpp(Tf),MyOrder_bpp(of),MyTicket_bpp(tf),
+                 const char* stationfile):User_list(uf),Train_bpp(Tf),MyOrder_bpp(of),MyTicket_bpp(tf),
                                           Station_link(stationfile,4096){
             strcpy(Trainfile,Tf);
             strcpy(Trainidfile,Tfid);

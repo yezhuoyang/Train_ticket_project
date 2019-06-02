@@ -7,8 +7,8 @@
 using namespace sjtu;
 int main(){
 
-    //char r_path[100]="/Users/yezhuoyang/Desktop/Train_ticket_project/data/";
-    char r_path[100]="./";
+    char r_path[100]="/Users/yezhuoyang/Desktop/Train_ticket_project/data/";
+    //char r_path[100]="./";
     char User_file[100];
     strcpy(User_file,r_path);
     char train_file[100];

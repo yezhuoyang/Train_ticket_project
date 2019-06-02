@@ -64,9 +64,7 @@ private:
         }
     };
     Bufferpool *bufferpool;
-
     char *buffer;
-
     const size_t tnode_max;
     const size_t block_max;
     const size_t tnode_min;
