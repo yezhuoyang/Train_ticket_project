@@ -33,7 +33,6 @@ private:
     off_t  head;
     off_t  tail;
     off_t  root;
-
     FILE * file;
     char * filename;
 
