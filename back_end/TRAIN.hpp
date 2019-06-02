@@ -24,11 +24,10 @@ namespace sjtu {
     }
     struct Station{
         char loc[LOCSIZE];
-        int  remain[30][PRICENUM];
         //某站出发的车票和第一站出发的车票隔的天数
         int  ad;
         Time arrive_time,start_time,stop_time;
-        double price[PRICENUM];
+        double price[5];
         int type_num;
         Station& operator=(const Station& rhs){
             if(&rhs==this) return *this;
@@ -37,13 +36,10 @@ namespace sjtu {
             stop_time=rhs.stop_time;
             type_num=rhs.type_num;
             ad=rhs.ad;
+            strcpy(loc,rhs.loc);
             for(int i=0;i<type_num;++i){
                 price[i]=rhs.price[i];
-                for(int j=0;j<30;++j){
-                    remain[j][i]=rhs.remain[j][i];
-                }
             }
-            strcpy(loc,rhs.loc);
             return *this;
         }
         Station(const Station& rhs){
@@ -54,23 +50,15 @@ namespace sjtu {
             type_num=rhs.type_num;
             for(int i=0;i<type_num;++i){
                 price[i]=rhs.price[i];
-                for(int j=0;j<30;++j){
-                    remain[j][i]=rhs.remain[j][i];
-                }
             }
             strcpy(loc,rhs.loc);
         }
         Station(){
             type_num=0;ad=0;
         }
-        void add_ticket(){
-            for(int i=0;i<type_num;++i){
-                for(int j=0;j<30;++j){
-                    remain[j][i]=2000;
-                }
-            }
-        }
     };
+
+
     std::istream& operator>>(std::istream &is,Station& S){
         char tmp[15];
         is>>S.loc>>S.arrive_time>>S.start_time>>S.stop_time;
@@ -78,9 +66,10 @@ namespace sjtu {
             is>>tmp;
             S.price[i]=transform_to_double(tmp);
         }
-        S.add_ticket();
         return is;
     }
+
+
     struct Trainkey{
         char train_id[IDSIZE];
         Trainkey(const char*tid){
@@ -96,18 +85,20 @@ namespace sjtu {
         }
         Trainkey()= default;
     };
+
     class compare_train{
     public:
         bool operator () (const Trainkey& T1,const Trainkey& T2) const {
             return strcmp(T1.train_id,T2.train_id)<0;
         }
     };
+
     struct Train {
         char name[TRAINNAME];
         char catalog[CATSIZE];
         int station_num;
         //存放Station在文件中存放的位置
-        block stblock;
+        myblock stblock;
         /*
          * Whether the train is already forsale or not
          */
@@ -148,6 +139,8 @@ namespace sjtu {
             price_num=0;
         }
     };
+
+
     struct myTicketkey{
         char loc[LOCSIZE];
         char tid[IDSIZE];
@@ -167,6 +160,9 @@ namespace sjtu {
         }
         myTicketkey()= default;
     };
+
+
+
     struct myTicket{
         //判断一个Ticket是否是默认构造出的元素
         bool exist;
@@ -193,6 +189,8 @@ namespace sjtu {
             return *this;
         }
     };
+
+
     class compare_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
@@ -204,6 +202,10 @@ namespace sjtu {
             return false;
         }
     };
+
+
+
+
     class search_myticket{
     public:
         bool operator () (const myTicketkey& T1,const myTicketkey& T2) const {
@@ -212,6 +214,7 @@ namespace sjtu {
             return true;
         }
     };
+
     struct myOrderkey{
         int Uid;
         Date D;
@@ -234,6 +237,8 @@ namespace sjtu {
             strcpy(train_id,rhs.train_id);
         }
     };
+
+
     struct myOrder{
         //所购买车票对应的车站位置
         int x;
@@ -270,6 +275,7 @@ namespace sjtu {
             return *this;
         }
     };
+
     /*
      * The ticket information to be stored in User bptree;
      */
@@ -418,7 +424,7 @@ namespace sjtu {
 
 
 
-    
+
 }
 
 
