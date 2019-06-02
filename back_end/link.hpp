@@ -109,8 +109,6 @@ namespace sjtu{
         }
     };
 
-
-
     template<class value>
     class list{
     private:
@@ -144,13 +142,11 @@ namespace sjtu{
         int Size(){
             return Sz;
         }
-
         void clear(){
             freopen(filename,"wb+",F);
             Sz=0;
             bufsize=bufpos=0;
         }
-
         int push_back(const value& V){
             if(bufsize>=maxbuf){
                 flushbuffer();
@@ -291,14 +287,22 @@ namespace sjtu{
         void read_block(const myblock&B,sjtu::vector<value1>& V1,sjtu::vector<value2> &V2){
             flushbuffer();
             fseek(F,B.pos,SEEK_SET);
+            char * tmp=new char[V1.size()*bs1+V2.size()*bs2+1];
+            fread(tmp,1,B.S1*bs1+B.S2*bs2,F);
+            memcpy(buffer1,tmp,B.S1*bs1);
+            memcpy(buffer2,tmp+B.S1*bs1,B.S2*bs2);
+            /*
             fread(buffer1,bs1,B.S1,F);
             fread(buffer2,bs2,B.S2,F);
+            */
             for(int i=0;i<B.S1;++i){
                 V1.push_back(buffer1[i]);
             }
             for(int j=0;j<B.S2;++j){
                 V2.push_back(buffer2[j]);
             }
+
+            delete[] tmp;
         }
         void read_block(const myblock&B,sjtu::vector<value1>& V1){
             flushbuffer();
