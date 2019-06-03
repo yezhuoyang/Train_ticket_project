@@ -8,6 +8,8 @@ using namespace sjtu;
 int main(){
 
     //char r_path[100]="/Users/yezhuoyang/Desktop/Train_ticket_project/data/";
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(0);
     char r_path[100]="./";
     char User_file[100];
     strcpy(User_file,r_path);
