@@ -24,6 +24,7 @@ namespace sjtu {
     }
     struct Station{
         char loc[LOCSIZE];
+        //某站出发的车票和第一站出发的车票隔的天数
         short  ad;
         Time arrive_time,start_time,stop_time;
         double price[5];
@@ -378,6 +379,7 @@ namespace sjtu {
         if(strcmp(T1.train_id,T2.train_id)<0) return true;
         return false;
     }
+
 
 
     bool operator<=(const myOrderkey &T1,const myOrderkey &T2){

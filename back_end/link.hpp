@@ -8,15 +8,6 @@
 #include "../STLITE/deque.hpp"
 #include<vector>
 #include "constant.h"
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-
 namespace sjtu{
     //这是一个用来存储外存某一块区域的大小、位置的结构体
     struct block{
@@ -194,8 +185,6 @@ namespace sjtu{
     };
 
 
-
-    /*
     template<class value>
     class mylist{
     private:
@@ -249,8 +238,6 @@ namespace sjtu{
             fflush(F);
         }
     };
-    */
-
 
 
     struct myblock{
@@ -263,6 +250,7 @@ namespace sjtu{
             S2=s2;
         }
     };
+
     template<class value1,class value2>
     class mylink{
     private:
@@ -407,61 +395,11 @@ namespace sjtu{
 
 
 
-    template<class value>
-    class mylist{
-    private:
-        char  filename[100];
-        char  idxfilename[100];
-        FILE* idxF;
-        int Sz;
-        int fd;
-        const size_t blocksize;
-        value* buffer;
-    public:
-        mylist(const char* FN,const char* idx):blocksize(sizeof(value)){
-            strcpy(filename,FN);
-            strcpy(idxfilename,idx);
-            idxF=fopen(idxfilename,"rb+");
-            if(idxF==NULL){
-                Sz=0;
-                idxF=fopen(idxfilename,"wb+");
-            }
-            else{
-                fread(&Sz,sizeof(int),1,idxF);
-            }
-            fd=open(filename,O_RDWR|O_CREAT,0644);
-            lseek(fd,6656000,SEEK_END);
-            write(fd,"\0",1);
-            buffer=(value*)mmap(NULL,6656000,PROT_READ|PROT_WRITE,MAP_SHARED,fd,0);
-        }
-        ~mylist(){
-            close(fd);
-            munmap((void*)buffer,6656000);
-            fseek(idxF,0,SEEK_SET);
-            fwrite(&Sz, sizeof(int),1,idxF);
-            fclose(idxF);
-        }
-        int Size(){
-            return Sz;
-        }
-        void clear(){
-            Sz=0;
-        }
-        int push_back(const value& V){
-            buffer[Sz++]=V;
-            return 1;
-        }
-        int modify(const int&pos,const value& V){
-            if(pos>=Sz) return 0;
-            buffer[pos]=V;
-            return 1;
-        }
-        int find(const int&pos,value &V){
-            if(pos>=Sz) return 0;
-            V=buffer[pos];
-            return 1;
-        }
-    };
+
+
+
+
+
 
 
 

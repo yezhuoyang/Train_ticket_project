@@ -45,6 +45,28 @@ namespace sjtu{
         char  Trainfile[FILENAME];char Trainidfile[FILENAME];
         char  myOrderfile[FILENAME];char myOrderidfile[FILENAME];
         char  myTicketfile[FILENAME];char myTicketidfile[FILENAME];
+        /*
+         * Enumerate type for different operation
+         * Reg:      register          *name* *password* *email* *phone*
+         * Log:      login             *id* *password*
+         * Qp:       query_profile     *id*
+         * Mpro:     modify_profile    *id* *name* *password* *email* *phone*
+         * Mpri:     modify_privilege  *id1* *id2* *privilege*
+         * Qti:      query_ticket      *loc1* *loc2* *date* *catalog*
+         * Qtrs:     query_transfer    *loc1* *loc2* *date* *catalog*
+         * Bt:       buy_ticket        *id* *num* *train_id* *loc1* *loc2* *date* *ticket_kind*
+         * Qo:       query_order       *id* *date* *catalog*
+         * Rt:       refund_ticket     *id* *num* *train_id* *loc1* *loc2* *date* *ticket_kind*
+         * At:       add_train         *train_id* *name* *catalog* *num(station)* *num(price)* *(name(price) ) xnum(price)*
+                                           *[name time(arriv) time(start) time(stopover) (price) x num(price) ] x num(station)*
+         * St:       sale_train        *train_id*
+         * Qtra:     query_train       *train_id*
+         * Dt:       delete_train      *train_id*
+         * Mt:       modify_train      *train_id* *name* *catalog* *num(station)* *num(price)* *(name(price) ) xnum(price)*
+                                           *[name time(arriv) time(start) time(stopover) (price) x num(price) ] x num(station)*
+         * Cl:       clean
+         * Ex:       exit
+         */
         enum type{
             Reg,Log,Qp,Mpro,Mpri,Qti,Qtrs,Bt,Qo,Rt,At,St,Qtra,Dt,Mt,Cl,Ex
         };
@@ -100,9 +122,12 @@ namespace sjtu{
         void print_ticket(const char* tid,const  sjtu::vector<Station>& ST,const Train& T,const sjtu::vector<short>& RM,const Date& d,const int&x,const int&y);
 
 
+        /*
+   * 返回x-y车站剩余车票数
+   */
     public:
-        terminal(const char* uf,const char* uidf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
-                 const char* stationfile):User_list(uf,uidf),Train_bpp(Tf),MyOrder_bpp(of),MyTicket_bpp(tf),
+        terminal(const char* uf,const char* Tf,const char* Tfid,const char* of,const char* ofid,const char* tf,const char* tfid,
+                 const char* stationfile):User_list(uf),Train_bpp(Tf),MyOrder_bpp(of),MyTicket_bpp(tf),
                                           Station_link(stationfile,4096){
             strcpy(Trainfile,Tf);
             strcpy(Trainidfile,Tfid);
@@ -241,12 +266,12 @@ namespace sjtu{
         }
     };
 
-
     int terminal::Register(const char *name, const char *pass, const char *email, const char *phone){
         User U;
         U.modify(name, pass, email, phone);
         U.privilege = '1';
         if (current_id == FIRSTID) U.privilege = '2';
+        //读取失败！
         User_list.push_back(U);
         ++current_id;
         return 1;

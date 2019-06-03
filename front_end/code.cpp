@@ -11,8 +11,6 @@ int main(){
     char r_path[100]="./";
     char User_file[100];
     strcpy(User_file,r_path);
-    char Useridx[100];
-    strcpy(Useridx,r_path);
     char train_file[100];
     strcpy(train_file,r_path);
     char train_id[100];
@@ -28,7 +26,6 @@ int main(){
     char station[100];
     strcpy(station,r_path);
     strcat(User_file,"User.txt");
-    strcat(Useridx,"Userid.txt");
     strcat(train_file,"train.txt");
     strcat(train_id,"trainid.txt");
     strcat(order,"order.txt");
@@ -36,7 +33,7 @@ int main(){
     strcat(ticket,"ticket.txt");
     strcat(ticketid,"ticketid.txt");
     strcat(station,"station.txt");
-    terminal T(User_file,Useridx,train_file,train_id,order,orderid,ticket,ticketid,station);
+    terminal T(User_file,train_file,train_id,order,orderid,ticket,ticketid,station);
     int c=1;
     while(c){
         c=T.execute();

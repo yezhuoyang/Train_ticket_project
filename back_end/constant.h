@@ -44,7 +44,7 @@
 #define  UBSIZE 100
 
 //车站缓存区大小
-#define  STBSIZE 500
+#define  STBSIZE 300
 
 #define  TRAINBppSIZE 4096
 
@@ -52,7 +52,7 @@
 
 #define  TicketBppSIZE 4096
 
-#define  BUFFERSIZE  1000
+#define  BUFFERSIZE  500
 
 #define   REMAINSIZE 800
 
