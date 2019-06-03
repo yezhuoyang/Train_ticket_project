@@ -1,2 +1,7 @@
 # Train_ticket_project
-An online train ticket system.
+组内分工
+叶卓杨 后端数据库实现及其优化
+张扬天 B+树实现及其优化
+戚龙杰 前端设计
+陈冲   前端设计
+黎学丞 前端设计
